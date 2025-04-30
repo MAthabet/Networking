@@ -9,21 +9,20 @@ namespace NGOTanks
 {
     public class NetworkPlayer : NetworkBehaviour
     {
-        Rigidbody rb;
         [SerializeField] Transform cannonPivot;
         [SerializeField] Transform bulletHole;
         [SerializeField] TextMeshProUGUI text_PlayerName;
         [SerializeField] Transform PlayerHealth;
         [SerializeField] Transform HUDRoot;
         [SerializeField] bullet bulletPrefab;
-        [SerializeField] int MaxHealth = 100;
-                
-
+        [SerializeField] float MaxHealth = 100;
+          
         Transform camera;
-
+        Rigidbody rb;
+        bool isDead;
 
         NetworkVariable<FixedString64Bytes> pName = new NetworkVariable<FixedString64Bytes>();
-        NetworkVariable<int> pHealth = new NetworkVariable<int>();
+        NetworkVariable<float> pHealth = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()
         {
@@ -38,19 +37,19 @@ namespace NGOTanks
             else
             {
                 initPlayerNameUI();
-                OnPlayerHealthChanged(0, pHealth.Value);
             }
+            //manually force calling the function cuz client go has not subscribed to delegate before server changing pHealth
+            OnPlayerHealthChanged(0, pHealth.Value);
             if (IsServer)
             {
                 pHealth.Value = MaxHealth;
-                Debug.Log($"Server: {pHealth.Value}");
             }
+
         }
 
-        private void OnPlayerHealthChanged(int previousValue, int newValue)
+        private void OnPlayerHealthChanged(float previousValue, float newValue)
         {
-            PlayerHealth.localScale = new Vector3((float)newValue / MaxHealth, 1, 1);
-            Debug.Log($"Player Health: {newValue}");
+            PlayerHealth.localScale = new Vector3(newValue / MaxHealth, 1, 1);
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -63,6 +62,10 @@ namespace NGOTanks
         // Update is called once per frame
         void Update()
         {
+            if(isDead)
+            {
+                return;
+            }
             if(IsLocalPlayer)
             {
                 float moveHorizontal = Input.GetAxis("Horizontal");
@@ -103,20 +106,45 @@ namespace NGOTanks
         void ShootServerRpc()
         {
             bullet b = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
-            ShootClientRpc();
-
+            ShootClientRpc(bulletHole.position, bulletHole.rotation);
         }
         [ClientRpc]
-        void ShootClientRpc()
+        void ShootClientRpc(Vector3 pos, Quaternion rot)
         {
             if (!IsHost)
             {
-                bullet b = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
+                bullet b = Instantiate(bulletPrefab, pos, rot);
             }
+        }
+        [ClientRpc]
+        void killPlayerClientRpc()
+        {
+            isDead = true;
         }
         void initPlayerNameUI()
         {
             text_PlayerName.text = pName.Value.ToString();
+        }
+        public void TakeDamage(float damage)
+        {
+            if(!IsServer)
+            {
+                Debug.LogWarning("TakeDamage Should not called in client");
+                return;
+            }
+            pHealth.Value -= damage;
+            if (pHealth.Value <= 0)
+            {
+                killPlayerClientRpc();
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            pName.OnValueChanged -= OnPlayerNameChanged;
+            pHealth.OnValueChanged -= OnPlayerHealthChanged;
+
         }
     }
 }
