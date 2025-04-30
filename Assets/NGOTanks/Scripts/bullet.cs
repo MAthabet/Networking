@@ -7,6 +7,8 @@ namespace NGOTanks
     {
         [SerializeField] float speed;
         [SerializeField] float damage;
+
+        ulong ownerID;
         Rigidbody rb;
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -22,6 +24,11 @@ namespace NGOTanks
         
         }
 
+        public void init(ulong ID)
+        {
+            ownerID = ID;
+        }
+
         private void OnTriggerEnter(Collider other)
         {
             if(NetworkingManager.Singleton.IsServer)
@@ -30,7 +37,7 @@ namespace NGOTanks
                 {
                     if(other.TryGetComponent<NetworkPlayer>(out NetworkPlayer netPlayer))
                     {
-                        netPlayer.TakeDamage(damage);
+                        netPlayer.TakeDamage(damage, ownerID);
                     }
                 }
             }

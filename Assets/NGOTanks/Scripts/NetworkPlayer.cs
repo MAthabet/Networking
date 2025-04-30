@@ -21,18 +21,20 @@ namespace NGOTanks
         Rigidbody rb;
         bool isDead;
 
-        NetworkVariable<FixedString64Bytes> pName = new NetworkVariable<FixedString64Bytes>();
+        //NetworkVariable<FixedString64Bytes> pData = new NetworkVariable<FixedString64Bytes>();
+        NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>();
         NetworkVariable<float> pHealth = new NetworkVariable<float>();
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            pName.OnValueChanged += OnPlayerNameChanged;
+            pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
+
 
             if (IsLocalPlayer)
             {
-                UpdateNameServerRpc(NetworkingManager.Singleton.localPlayerName);
+                UpdatePlayerDataServerRpc(pData.Value);
             }
             else
             {
@@ -45,6 +47,7 @@ namespace NGOTanks
                 pHealth.Value = MaxHealth;
             }
 
+            NetworkingManager.Singleton.addPlayer(this);
         }
 
         private void OnPlayerHealthChanged(float previousValue, float newValue)
@@ -90,22 +93,23 @@ namespace NGOTanks
             HUDRoot.LookAt(camera);
         }
 
-        private void OnPlayerNameChanged(FixedString64Bytes previousValue, FixedString64Bytes newValue)
+
+        private void OnPlayerDataChanged(PlayerData previousValue, PlayerData newValue)
         {
             initPlayerNameUI();
-            OnPlayerHealthChanged(0, pHealth.Value);
         }
 
         [ServerRpc]
-        void UpdateNameServerRpc(FixedString64Bytes value)
+        void UpdatePlayerDataServerRpc(PlayerData value)
         {
-            pName.Value = value;
+            pData.Value = value;
         }
 
         [ServerRpc]
         void ShootServerRpc()
         {
             bullet b = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
+            b.init(OwnerClientId);
             ShootClientRpc(bulletHole.position, bulletHole.rotation);
         }
         [ClientRpc]
@@ -114,37 +118,42 @@ namespace NGOTanks
             if (!IsHost)
             {
                 bullet b = Instantiate(bulletPrefab, pos, rot);
+                b.init(OwnerClientId);
             }
         }
         [ClientRpc]
-        void killPlayerClientRpc()
+        void killPlayerClientRpc(ulong killerID)
         {
             isDead = true;
+            Debug.Log($"Player:{pData.Value} killled by {NetworkingManager.Singleton.getPlayer(killerID).pData.Value}");
         }
         void initPlayerNameUI()
         {
-            text_PlayerName.text = pName.Value.ToString();
+            text_PlayerName.text = pData.Value.ToString();
+            
         }
-        public void TakeDamage(float damage)
+        public void TakeDamage(float damage, ulong bulletOwnerID)
         {
             if(!IsServer)
             {
                 Debug.LogWarning("TakeDamage Should not called in client");
                 return;
             }
+            if (isDead) return;
             pHealth.Value -= damage;
             if (pHealth.Value <= 0)
             {
-                killPlayerClientRpc();
+                killPlayerClientRpc(NetworkingManager.Singleton.getPlayer(bulletOwnerID).OwnerClientId);
             }
         }
 
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
-            pName.OnValueChanged -= OnPlayerNameChanged;
+            pData.OnValueChanged -= OnPlayerDataChanged;
             pHealth.OnValueChanged -= OnPlayerHealthChanged;
 
+            NetworkingManager.Singleton.removePlayer(OwnerClientId);
         }
     }
 }
