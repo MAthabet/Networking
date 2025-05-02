@@ -15,13 +15,16 @@ namespace NGOTanks
         [SerializeField] Transform PlayerHealth;
         [SerializeField] Transform HUDRoot;
         [SerializeField] bullet bulletPrefab;
-        [SerializeField] float MaxHealth = 100;
           
         Transform camera;
         Rigidbody rb;
         bool isDead;
 
-        //NetworkVariable<FixedString64Bytes> pData = new NetworkVariable<FixedString64Bytes>();
+        float MaxHealth;
+        float speed;
+        float rotationSpeed;
+        float damage;
+
         NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>();
         NetworkVariable<float> pHealth = new NetworkVariable<float>();
 
@@ -30,7 +33,6 @@ namespace NGOTanks
             base.OnNetworkSpawn();
             pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
-
 
             if (IsLocalPlayer)
             {
@@ -58,8 +60,12 @@ namespace NGOTanks
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            rb = GetComponent<Rigidbody>();
-            camera = Camera.main.transform;
+            if(IsLocalPlayer)
+            {
+                rb = GetComponent<Rigidbody>();
+                camera = Camera.main.transform;
+                GetComponent<PlayerInput>().Enable();
+            }
         }
 
         // Update is called once per frame
@@ -69,27 +75,6 @@ namespace NGOTanks
             {
                 return;
             }
-            if(IsLocalPlayer)
-            {
-                float moveHorizontal = Input.GetAxis("Horizontal");
-                float moveVertical = Input.GetAxis("Vertical");
-                Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-                rb.MovePosition(rb.position + movement * Time.deltaTime);
-                if(Input.GetKeyDown(KeyCode.D))
-                {
-                    cannonPivot.Rotate(Vector3.up, 45);
-                }
-                if (Input.GetKeyDown(KeyCode.A))
-                {
-                    cannonPivot.Rotate(Vector3.up, -45);
-                }
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    ShootServerRpc();
-                    
-                }
-            }
-
             HUDRoot.LookAt(camera);
         }
 
@@ -125,6 +110,7 @@ namespace NGOTanks
         void killPlayerClientRpc(ulong killerID)
         {
             isDead = true;
+            GetComponent<PlayerInput>().Disable();
             Debug.Log($"Player:{pData.Value} killled by {NetworkingManager.Singleton.getPlayer(killerID).pData.Value}");
         }
         void initPlayerNameUI()
@@ -155,5 +141,22 @@ namespace NGOTanks
 
             NetworkingManager.Singleton.removePlayer(OwnerClientId);
         }
+
+        #region Inputs
+
+        void OnFire()
+        {
+            ShootServerRpc();
+        }
+        void OnMove(Vector2 move)
+        {
+            Vector3 movement = new Vector3(move.x, 0.0f, move.y);
+            rb.MovePosition(rb.position + movement * Time.deltaTime);
+        }
+        void OnRotateTorret(float rot)
+        {
+            cannonPivot.Rotate(Vector3.up * rot * rotationSpeed * Time.deltaTime);
+        }
+        #endregion
     }
 }

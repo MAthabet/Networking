@@ -10,6 +10,7 @@ namespace NGOTanks
         public static new NetworkingManager Singleton => singleton;
 
         public const string GameSceneName = "Gameplay";
+        public const string LobbySceneName = "Lobby";
         public const string MainMenuSceneName = "MainMenu";
 
         public string localPlayerName;
@@ -44,7 +45,7 @@ namespace NGOTanks
 
         private void HandleServerStarted()
         {
-            SceneManager.LoadScene(GameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            SceneManager.LoadScene(LobbySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
 
         // Update is called once per frame
