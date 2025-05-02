@@ -110,13 +110,13 @@ namespace NGOTanks
         void killPlayerClientRpc(ulong killerID)
         {
             isDead = true;
-            GetComponent<PlayerInput>().Disable();
+            if(IsLocalPlayer)
+                GetComponent<PlayerInput>().Disable();
             Debug.Log($"Player:{pData.Value} killled by {NetworkingManager.Singleton.getPlayer(killerID).pData.Value}");
         }
         void initPlayerNameUI()
         {
             text_PlayerName.text = pData.Value.ToString();
-            
         }
         public void TakeDamage(float damage, ulong bulletOwnerID)
         {

@@ -16,8 +16,7 @@ namespace NGOTanks
         public string localPlayerName;
 
         [SerializeField] private NetworkObject playerPrefab;
-        private Dictionary<ulong, NetworkPlayer> netPlayers;
-
+        private Dictionary<ulong, NetworkPlayer> netPlayers = new Dictionary<ulong, NetworkPlayer>();
 
         private void Awake()
         {
@@ -48,12 +47,6 @@ namespace NGOTanks
             SceneManager.LoadScene(LobbySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
-
         public void SpawnPlayer(ulong clientId)
         {
             NetworkObject netPlayer = Instantiate(playerPrefab);
@@ -64,10 +57,9 @@ namespace NGOTanks
             localPlayerName = playerName;
         }
 
+
         public void addPlayer(NetworkPlayer player)
         {
-            if(netPlayers == null)
-                netPlayers = new Dictionary<ulong, NetworkPlayer> ();
             if (netPlayers.ContainsKey(player.OwnerClientId)) return;
             netPlayers.Add(player.OwnerClientId, player);
         }
@@ -90,7 +82,6 @@ namespace NGOTanks
         {
             OnServerStarted -= HandleServerStarted;
             OnClientConnectedCallback -= HandleClientConnected;
-
         }
     }
 }

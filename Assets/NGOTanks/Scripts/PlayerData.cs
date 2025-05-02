@@ -6,7 +6,7 @@ namespace NGOTanks
 {
     public enum Team
     {
-        Red,
+        Brown,
         Blue
     }
     public enum Class
