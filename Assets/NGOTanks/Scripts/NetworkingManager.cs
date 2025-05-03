@@ -13,7 +13,11 @@ namespace NGOTanks
         public const string LobbySceneName = "Lobby";
         public const string MainMenuSceneName = "MainMenu";
 
-        public string localPlayerName;
+        private PlayerData localPlayerData;
+        public PlayerData LocalPlayerData
+        {
+            get => localPlayerData;
+        }
 
         [SerializeField] private NetworkObject playerPrefab;
         private Dictionary<ulong, NetworkPlayer> netPlayers = new Dictionary<ulong, NetworkPlayer>();
@@ -54,7 +58,7 @@ namespace NGOTanks
         }
         public void UpdatePlayerName(string playerName)
         {
-            localPlayerName = playerName;
+            localPlayerData.playerName = playerName;
         }
 
 
@@ -64,34 +68,35 @@ namespace NGOTanks
             netPlayers.Add(player.OwnerClientId, player);
             if (!player.IsLocalPlayer)
             {
-                UIManager.Singleton.AddPlayer(player.OwnerClientId, player.getName());
+                UIManager.Singleton.AddPlayer(player.OwnerClientId, player.GetName());
             }
 
         }
 
-        public NetworkPlayer getPlayer(ulong ID)
+        public NetworkPlayer GetPlayer(ulong ID)
         {
             if(netPlayers.ContainsKey(ID))
                 return netPlayers[ID];
             else
             {
-                Debug.Log("cannot find");
+                Debug.Log("cannot find player: " + ID);
                 return null;
             }
         }
-        public void removePlayer(ulong ID)
+        public void RemovePlayer(ulong ID)
         {
             netPlayers.Remove(ID);
             UIManager.Singleton.RemovePlayer(ID);
         }
-
-        public void updatePlayerTeam(ulong ID,Team newTeam)
+        public void UpdatePlayerTeam(ulong ID,Team newTeam)
         {
-            getPlayer(ID).ChangeTeam(newTeam);
+            localPlayerData.playerTeam = newTeam;
+            GetPlayer(ID).ChangeTeam(newTeam);
         }
-        public void updatePlayerClass(ulong ID, Class newClass)
+        public void UpdatePlayerClass(ulong ID, Class newClass)
         {
-            getPlayer(ID).ChangeClass(newClass);
+            localPlayerData.playerClass = newClass;
+            GetPlayer(ID).ChangeClass(newClass);
         }
         private void OnDestroy()
         {

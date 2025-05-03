@@ -2,17 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 namespace NGOTanks
 {
     public class UIManager : MonoBehaviour
     {
+        #region variables
         static UIManager singleton;
         public static UIManager Singleton => singleton;
 
         [SerializeField] Color blueTeamColor = Color.blue;
         [SerializeField] Color brownTeamColor = Color.green;
+        Color neutralTeamColor;
 
         [SerializeField] private TMP_InputField IF_PlayerName;
         [SerializeField] private Canvas MainMenuCanva;
@@ -22,9 +24,11 @@ namespace NGOTanks
         [SerializeField] private TMP_Text PlayerNameText;
         [SerializeField] private GameObject HostPanel;
         [SerializeField] private Toggle friendlyFire;
-        [SerializeField] private List<TMP_Text> PlayersInLobbyText = new List<TMP_Text>();
+        [SerializeField] private List<TMP_Text> PlayersInLobbyText;
+        [SerializeField] private List<Button> StartBtns;
 
         private Dictionary<ulong, TMP_Text> textMap = new Dictionary<ulong, TMP_Text>();
+        #endregion
         private void Awake()
         {
             if (singleton == null)
@@ -39,6 +43,8 @@ namespace NGOTanks
         }
         private void Start()
         {
+            neutralTeamColor = PlayersInLobbyText[0].color;
+
             InitializeUI();
             MainMenuCanva.enabled = true;
             HostPanel.SetActive(false);
@@ -48,8 +54,9 @@ namespace NGOTanks
             {
                 text.text = "";
             }
-        }
 
+            ChangeMainMenuButtonsInteraction(false);
+        }
         private void DisableUi()
         {
             MainMenuCanva.enabled = false;
@@ -60,10 +67,12 @@ namespace NGOTanks
         public void InitializeUI()
         {
             List<string> teamNames = System.Enum.GetNames(typeof(Team)).ToList<string>();
+            teamNames[0] = "Select Team";
             DD_Team.ClearOptions();
             DD_Team.AddOptions(teamNames);
 
             List<string> classNames = System.Enum.GetNames(typeof(Class)).ToList<string>();
+            classNames[0] = "Select Class";
             DD_Class.ClearOptions();
             DD_Class.AddOptions(classNames);
 
@@ -71,7 +80,17 @@ namespace NGOTanks
             {
                 text.text = "";
             }
+            
         }
+        private void ChangeMainMenuButtonsInteraction(bool isInteractable)
+        {
+            foreach (Button btn in StartBtns)
+            {
+                btn.interactable = isInteractable;
+            }
+        }
+
+        #region events
         public void OnStartServerClicked()
         {
             NetworkingManager.Singleton.StartServer();
@@ -99,15 +118,29 @@ namespace NGOTanks
                 NetworkingManager.Singleton.SceneManager.LoadScene(NetworkingManager.GameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
         }
+        public void OnIFValueChanged()
+        {
+            if (IF_PlayerName.text == null || IF_PlayerName.text == "")
+                ChangeMainMenuButtonsInteraction(false);
+            else
+                ChangeMainMenuButtonsInteraction(true);
+        }
 
         public void OnDD_TeamValueChanged()
         {
-
+            if (DD_Team.value == 0)
+                return;
+            NetworkingManager.Singleton.UpdatePlayerTeam(NetworkingManager.Singleton.LocalClientId,(Team) DD_Team.value); 
+            
         }
         public void OnDD_ClassValueChanged()
         {
-
+            if(DD_Class.value == 0)
+                return;
+            NetworkingManager.Singleton.UpdatePlayerClass(NetworkingManager.Singleton.LocalClientId,(Class) DD_Class.value);
         }
+        #endregion
+
         public void GetName()
         {
             NetworkingManager.Singleton.UpdatePlayerName(IF_PlayerName.text);
@@ -143,6 +176,7 @@ namespace NGOTanks
                     {
                         textMap.Add(id, text);
                         text.text = name;
+                        UpdatePlayerTeam(id, NetworkingManager.Singleton.GetPlayer(id).GetTeam());
                         break;
                     }
                 }
@@ -159,19 +193,43 @@ namespace NGOTanks
 
         public void UpdatePlayerName(ulong id, string name)
         {
+            Debug.Log("name" + NetworkingManager.Singleton.GetPlayer(id).IsLocalPlayer);
             if (textMap.ContainsKey(id))
             {
                 textMap[id].text = name;
             }
-            else
+            else if(NetworkingManager.Singleton.GetPlayer(id).IsLocalPlayer)
             {
-                Debug.LogWarning("Player: "  + name + " Does Not exist");
+                PlayerNameText.text = name;
             }
         }
-
-        public void OnExitGameClicked()
+        public void UpdatePlayerTeam(ulong id, Team team)
         {
-            Application.Quit();
+            if (textMap.ContainsKey(id))
+            {
+                Debug.Log(textMap[id].text + " " + team.ToString() + " " + id);
+                switch (team)
+                {
+                    case Team.None:
+                        textMap[id].color = neutralTeamColor;
+                        break;
+                    case Team.Blue:
+                        textMap[id].color = blueTeamColor;
+                        break;
+                    case Team.Brown:
+                        textMap[id].color = brownTeamColor;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        public void UpdatePlayerClass(ulong id, Class playerClass)
+        {
+            if (textMap.ContainsKey(id))
+            {
+                textMap[id].text = playerClass.ToString();
+            }
         }
     }
 }
