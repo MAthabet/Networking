@@ -5,16 +5,23 @@ using System.Collections.Generic;
 
 namespace NGOTanks
 {
+    [System.Serializable]
+    public class SpawnPoint
+    {
+        public Team playerTeam;
+        public Class playerClass;
+        public Transform spawnTransform;
+    }
     public class GamePlayManager : MonoBehaviour
     {
-        [SerializeField] private List<Transform> spawnPoints;
+        [SerializeField] private List<SpawnPoint> spawnPoints;
         [SerializeField] NetworkObject playerPrefab;
-        int currentIndx = 0;
+
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
             NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
-            currentIndx = 0;
+
             if(NetworkingManager.Singleton.IsHost)
             {
                 spawnNextPlayer(NetworkingManager.Singleton.LocalClientId);
@@ -32,11 +39,11 @@ namespace NGOTanks
         {
             if (NetworkingManager.Singleton.IsServer)
             {
-                NetworkObject netPlayer = Instantiate(playerPrefab, spawnPoints[currentIndx].position, Quaternion.identity);
-                currentIndx++;
-                currentIndx %= spawnPoints.Count;
+                //NetworkObject netPlayer = Instantiate(playerPrefab, spawnPoints[currentIndx].position, Quaternion.identity);
+                //currentIndx++;
+                //currentIndx %= spawnPoints.Count;
 
-                netPlayer.SpawnAsPlayerObject(clientId);
+                //netPlayer.SpawnAsPlayerObject(clientId);
             }
 
         }

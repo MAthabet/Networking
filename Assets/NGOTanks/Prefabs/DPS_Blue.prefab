@@ -1310,6 +1310,7 @@ GameObject:
   - component: {fileID: -1004236137084577593}
   - component: {fileID: 5798064101893116576}
   - component: {fileID: 1920795070354863192}
+  - component: {fileID: 1228129124890193063}
   m_Layer: 0
   m_Name: DPS_Blue
   m_TagString: Tank
@@ -1473,6 +1474,19 @@ MonoBehaviour:
   PlayerHealth: {fileID: 1858743117310962684}
   HUDRoot: {fileID: 3336375498499430275}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
+--- !u!114 &1228129124890193063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5706765684457943553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83561ba45d68c14e9746e7ed85ccdad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tankStats: {fileID: 11400000, guid: 2f25d1a25b6d9bb4e80faa20c43b0255, type: 2}
 --- !u!1 &5776192457307203535
 GameObject:
   m_ObjectHideFlags: 0

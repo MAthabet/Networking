@@ -530,7 +530,7 @@ GameObject:
   m_Component:
   - component: {fileID: 908061742}
   m_Layer: 0
-  m_Name: spawnPos (2)
+  m_Name: Blue DPS Spawn Pos
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -669,7 +669,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1047895241}
   m_Layer: 0
-  m_Name: spawnPos (3)
+  m_Name: Brown DPS Spawn Pos
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -700,7 +700,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1378348753}
   m_Layer: 0
-  m_Name: spawnPos
+  m_Name: Blue Tank Spawn Pos
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1092,7 +1092,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2115260251}
   m_Layer: 0
-  m_Name: spawnPos (1)
+  m_Name: Brown Tank Spawn Pos
   m_TagString: Untagged
   m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -1157,11 +1157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6fec22112002fb4a929cee0157430b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoints:
-  - {fileID: 1378348753}
-  - {fileID: 908061742}
-  - {fileID: 2115260251}
-  - {fileID: 1047895241}
+  spawnPoints: []
   playerPrefab: {fileID: 1652490515019804612, guid: 1cded134e9d3d69488ed7b486a25ab44, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

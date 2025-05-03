@@ -45,6 +45,7 @@ GameObject:
   - component: {fileID: 5132490504661825900}
   - component: {fileID: 2750532708509254026}
   - component: {fileID: -820413799041592730}
+  - component: {fileID: 2534041809062168002}
   m_Layer: 0
   m_Name: Tank_Brown
   m_TagString: Tank
@@ -208,6 +209,19 @@ MonoBehaviour:
   PlayerHealth: {fileID: 2112023760148428934}
   HUDRoot: {fileID: 2615455381528092188}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
+--- !u!114 &2534041809062168002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1658995557577282881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e83561ba45d68c14e9746e7ed85ccdad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tankStats: {fileID: 11400000, guid: 8297190ee9c16d542bf586f95e4e65de, type: 2}
 --- !u!1 &1801496443562221353
 GameObject:
   m_ObjectHideFlags: 0
