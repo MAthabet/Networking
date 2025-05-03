@@ -157,6 +157,18 @@ namespace NGOTanks
             }
         }
 
+        public void UpdatePlayerName(ulong id, string name)
+        {
+            if (textMap.ContainsKey(id))
+            {
+                textMap[id].text = name;
+            }
+            else
+            {
+                Debug.LogWarning("Player: "  + name + " Does Not exist");
+            }
+        }
+
         public void OnExitGameClicked()
         {
             Application.Quit();

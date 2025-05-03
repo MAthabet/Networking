@@ -62,8 +62,10 @@ namespace NGOTanks
         {
             if (netPlayers.ContainsKey(player.OwnerClientId)) return;
             netPlayers.Add(player.OwnerClientId, player);
-            if(!player.IsLocalPlayer)
+            if (!player.IsLocalPlayer)
+            {
                 UIManager.Singleton.AddPlayer(player.OwnerClientId, player.getName());
+            }
 
         }
 
@@ -85,11 +87,11 @@ namespace NGOTanks
 
         public void updatePlayerTeam(ulong ID,Team newTeam)
         {
-            getPlayer(ID).changeTeam(newTeam);
+            getPlayer(ID).ChangeTeam(newTeam);
         }
         public void updatePlayerClass(ulong ID, Class newClass)
         {
-            getPlayer(ID).changeClass(newClass);
+            getPlayer(ID).ChangeClass(newClass);
         }
         private void OnDestroy()
         {

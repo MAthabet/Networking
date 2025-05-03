@@ -15,9 +15,9 @@ namespace NGOTanks
             base.OnNetworkSpawn();
             pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
-
+            if(IsLocalPlayer)
+                ChangeName(NetworkingManager.Singleton.localPlayerName);
             NetworkingManager.Singleton.addPlayer(this);
-            Debug.Log("spawned");
         }
         private void OnPlayerHealthChanged(float previousValue, float newValue)
         {
@@ -26,7 +26,15 @@ namespace NGOTanks
         }
         private void OnPlayerDataChanged(PlayerData previousValue, PlayerData newValue)
         {
-            initPlayerNameUI();
+            if(previousValue.playerName != newValue.playerName)
+                initPlayerNameUI();
+            //TODO:
+            if (previousValue.playerTeam != newValue.playerTeam)
+                ;
+            if (previousValue.playerClass != newValue.playerClass)
+                ;
+
+
         }
 
         #region ServerRpc
@@ -66,7 +74,7 @@ namespace NGOTanks
         #endregion
         void initPlayerNameUI()
         {
-
+            UIManager.Singleton.UpdatePlayerName(OwnerClientId, pData.Value.playerName.ToString());
         }
         public void TakeDamage(float damage, ulong bulletOwnerID)
         {
@@ -99,17 +107,23 @@ namespace NGOTanks
             }
         }
         
-        public void changeTeam(Team newTeam)
+        public void ChangeTeam(Team newTeam)
         {
             PlayerData p = pData.Value;
             p.playerTeam = newTeam;
-            pData.Value = p;
+            UpdatePlayerDataServerRpc(p);
         }
-        public void changeClass(Class newClass)
+        public void ChangeClass(Class newClass)
         {
             PlayerData p = pData.Value;
             p.playerClass = newClass;
-            pData.Value = p;
+            UpdatePlayerDataServerRpc(p);
+        }
+        public void ChangeName(string name)
+        {
+            PlayerData p = pData.Value;
+            p.playerName = name;
+            UpdatePlayerDataServerRpc(p);
         }
         public string getName()
         {
