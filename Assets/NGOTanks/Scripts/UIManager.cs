@@ -23,9 +23,12 @@ namespace NGOTanks
         [SerializeField] private TMP_Dropdown DD_Class;
         [SerializeField] private TMP_Text PlayerNameText;
         [SerializeField] private GameObject HostPanel;
+        [SerializeField] private GameObject ClientPanel;
         [SerializeField] private Toggle friendlyFire;
+        [SerializeField] private Toggle Ready;
         [SerializeField] private List<TMP_Text> PlayersInLobbyText;
         [SerializeField] private List<Button> StartBtns;
+        
 
         private Dictionary<ulong, TMP_Text> textMap = new Dictionary<ulong, TMP_Text>();
         #endregion
@@ -113,6 +116,11 @@ namespace NGOTanks
 
         public void OnStartGameClicked()
         {
+            if(NetworkingManager.Singleton.IsAllPlayerReady() == false)
+            {
+                Debug.Log("not all players are ready");
+                return;
+            }
             if (NetworkingManager.Singleton.IsHost)
             {
                 NetworkingManager.Singleton.SceneManager.LoadScene(NetworkingManager.GameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
@@ -128,16 +136,22 @@ namespace NGOTanks
 
         public void OnDD_TeamValueChanged()
         {
-            if (DD_Team.value == 0)
-                return;
             NetworkingManager.Singleton.UpdatePlayerTeam(NetworkingManager.Singleton.LocalClientId,(Team) DD_Team.value); 
-            
         }
         public void OnDD_ClassValueChanged()
         {
-            if(DD_Class.value == 0)
-                return;
             NetworkingManager.Singleton.UpdatePlayerClass(NetworkingManager.Singleton.LocalClientId,(Class) DD_Class.value);
+        }
+        public void OnReadyClicked()
+        {
+            if (Ready.isOn)
+            {
+                NetworkingManager.Singleton.UpdatePlayerReadyState(NetworkingManager.Singleton.LocalClientId, true);
+            }
+            else
+            {
+                NetworkingManager.Singleton.UpdatePlayerReadyState(NetworkingManager.Singleton.LocalClientId, false);
+            }
         }
         #endregion
 
@@ -155,10 +169,12 @@ namespace NGOTanks
             if (isHost)
             {
                 HostPanel.SetActive(true);
+                ClientPanel.SetActive(false);
             }
             else
             {
                 HostPanel.SetActive(false);
+                ClientPanel.SetActive(true);
             }
         }
 
@@ -177,6 +193,7 @@ namespace NGOTanks
                         textMap.Add(id, text);
                         text.text = name;
                         UpdatePlayerTeam(id, NetworkingManager.Singleton.GetPlayer(id).GetTeam());
+                        UpdatePlayerClass(id, NetworkingManager.Singleton.GetPlayer(id).GetClass());
                         break;
                     }
                 }
@@ -228,8 +245,22 @@ namespace NGOTanks
         {
             if (textMap.ContainsKey(id))
             {
-                textMap[id].text = playerClass.ToString();
+                string[] parts = textMap[id].text.Split('(');
+                string name = parts[0];
+                Debug.Log("Full name: " + textMap[id].text);
+                Debug.Log("name: " + parts[0]);
+                if (playerClass != Class.None)
+                {
+                    string className = playerClass.ToString();
+                    textMap[id].text = name + "(" + playerClass.ToString() + ")";
+                }
+                else
+                {
+                    textMap[id].text = name;
+                }
             }
+            
+
         }
     }
 }

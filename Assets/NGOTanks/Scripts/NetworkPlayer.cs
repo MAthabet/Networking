@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
+using System;
 
 namespace NGOTanks
 {
@@ -9,6 +10,7 @@ namespace NGOTanks
         Tank tank;
         NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>(new PlayerData("", Team.None, Class.None));
         NetworkVariable<float> pHealth = new NetworkVariable<float>(0);
+        NetworkVariable<bool> pIsReady = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
 
         public override void OnNetworkSpawn()
         {
@@ -16,10 +18,18 @@ namespace NGOTanks
 
             pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
-            if(IsLocalPlayer)
+            pIsReady.OnValueChanged += OnPlayerReadyChanged;
+
+            if (IsLocalPlayer)
                 ChangeName(NetworkingManager.Singleton.LocalPlayerData.playerName.ToString());
-            NetworkingManager.Singleton.addPlayer(this);
+            NetworkingManager.Singleton.AddPlayer(this);
         }
+
+        private void OnPlayerReadyChanged(bool previousValue, bool newValue)
+        {
+
+        }
+
         private void OnPlayerHealthChanged(float previousValue, float newValue)
         {
             if (tank)
@@ -81,6 +91,7 @@ namespace NGOTanks
         }
         void UpdateOtherPlayersClassUI()
         {
+            Debug.Log("called");
             UIManager.Singleton.UpdatePlayerClass(OwnerClientId, pData.Value.playerClass);
         }
 
@@ -98,7 +109,7 @@ namespace NGOTanks
                 killPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(bulletOwnerID).OwnerClientId);
             }
         }
-        public void spawnTank(Tank tankPrefab)
+        public void SpawnTank(Tank tankPrefab)
         {
             if (tank != null)
             {
@@ -133,6 +144,10 @@ namespace NGOTanks
             p.playerName = name;
             UpdatePlayerDataServerRpc(p);
         }
+        public void ChangeReadyState(bool isReady)
+        {
+            pIsReady.Value = isReady;
+        }
         public string GetName()
         {
             return pData.Value.playerName.ToString();
@@ -144,6 +159,10 @@ namespace NGOTanks
         public Class GetClass()
         {
             return pData.Value.playerClass;
+        }
+        public bool IsReady()
+        {
+            return pIsReady.Value;
         }
 
         public override void OnNetworkDespawn()

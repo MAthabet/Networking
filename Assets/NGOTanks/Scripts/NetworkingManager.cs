@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using System;
 
 namespace NGOTanks
 {
@@ -62,7 +63,7 @@ namespace NGOTanks
         }
 
 
-        public void addPlayer(NetworkPlayer player)
+        public void AddPlayer(NetworkPlayer player)
         {
             if (netPlayers.ContainsKey(player.OwnerClientId)) return;
             netPlayers.Add(player.OwnerClientId, player);
@@ -88,6 +89,17 @@ namespace NGOTanks
             netPlayers.Remove(ID);
             UIManager.Singleton.RemovePlayer(ID);
         }
+        public bool IsAllPlayerReady()
+        {
+            foreach(var player in netPlayers)
+            {
+                if (!player.Value.IsReady())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         public void UpdatePlayerTeam(ulong ID,Team newTeam)
         {
             localPlayerData.playerTeam = newTeam;
@@ -104,5 +116,9 @@ namespace NGOTanks
             OnClientConnectedCallback -= HandleClientConnected;
         }
 
+        internal void UpdatePlayerReadyState(ulong localClientId, bool isReady)
+        {
+            GetPlayer(localClientId).ChangeReadyState(isReady);
+        }
     }
 }
