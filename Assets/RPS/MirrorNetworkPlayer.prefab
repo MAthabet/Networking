@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: -168936060966857423}
   - component: {fileID: 6799727987676518288}
   m_Layer: 0
-  m_Name: NetworkPlayer
+  m_Name: MirrorNetworkPlayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

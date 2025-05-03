@@ -1309,8 +1309,7 @@ GameObject:
   - component: {fileID: 6080838890429990551}
   - component: {fileID: -1004236137084577593}
   - component: {fileID: 5798064101893116576}
-  - component: {fileID: 8911252629168971971}
-  - component: {fileID: 2144205637542514434}
+  - component: {fileID: 1920795070354863192}
   m_Layer: 0
   m_Name: DPS_Blue
   m_TagString: Tank
@@ -1456,7 +1455,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &8911252629168971971
+--- !u!114 &1920795070354863192
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1465,46 +1464,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 5706765684457943553}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 13071612b31a83c4eb29313c0ba0f191, type: 3}
+  m_Script: {fileID: 11500000, guid: af9027ee77b23b04b80be69bd7c33c5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowTopMostFoldoutHeaderGroup: 1
   cannonPivot: {fileID: 1200591876636236565}
   bulletHole: {fileID: 2403272794869571049}
   text_PlayerName: {fileID: 6820106770366854267}
   PlayerHealth: {fileID: 1858743117310962684}
   HUDRoot: {fileID: 3336375498499430275}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
---- !u!114 &2144205637542514434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5706765684457943553}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: e5ed23217063dc444854006ef9d47676, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: Control
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &5776192457307203535
 GameObject:
   m_ObjectHideFlags: 0

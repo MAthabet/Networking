@@ -1,32 +1,14 @@
 using UnityEngine;
 using Unity.Netcode;
-using Unity.Collections;
-using TMPro;
-using UnityEngine.UI;
-using System;
+using UnityEngine.InputSystem;
 
 namespace NGOTanks
 {
     public class NetworkPlayer : NetworkBehaviour
     {
-        [SerializeField] Transform cannonPivot;
-        [SerializeField] Transform bulletHole;
-        [SerializeField] TextMeshProUGUI text_PlayerName;
-        [SerializeField] Transform PlayerHealth;
-        [SerializeField] Transform HUDRoot;
-        [SerializeField] bullet bulletPrefab;
-          
-        Transform camera;
-        Rigidbody rb;
-        bool isDead;
-
-        float MaxHealth;
-        float speed;
-        float rotationSpeed;
-        float damage;
-
+        Tank tank;
         NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>();
-        NetworkVariable<float> pHealth = new NetworkVariable<float>();
+        NetworkVariable<float> pHealth = new NetworkVariable<float>(0);
 
         public override void OnNetworkSpawn()
         {
@@ -34,56 +16,20 @@ namespace NGOTanks
             pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
 
-            if (IsLocalPlayer)
-            {
-                UpdatePlayerDataServerRpc(pData.Value);
-            }
-            else
-            {
-                initPlayerNameUI();
-            }
-            //manually force calling the function cuz client go has not subscribed to delegate before server changing pHealth
-            OnPlayerHealthChanged(0, pHealth.Value);
-            if (IsServer)
-            {
-                pHealth.Value = MaxHealth;
-            }
-
             NetworkingManager.Singleton.addPlayer(this);
+            Debug.Log("spawned");
         }
-
         private void OnPlayerHealthChanged(float previousValue, float newValue)
         {
-            PlayerHealth.localScale = new Vector3(newValue / MaxHealth, 1, 1);
+            if (tank)
+                tank.UpdateHealth(newValue);
         }
-
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
-            if(IsLocalPlayer)
-            {
-                rb = GetComponent<Rigidbody>();
-                camera = Camera.main.transform;
-                GetComponent<PlayerInput>().Enable();
-            }
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            if(isDead)
-            {
-                return;
-            }
-            HUDRoot.LookAt(camera);
-        }
-
-
         private void OnPlayerDataChanged(PlayerData previousValue, PlayerData newValue)
         {
             initPlayerNameUI();
         }
 
+        #region ServerRpc
         [ServerRpc]
         void UpdatePlayerDataServerRpc(PlayerData value)
         {
@@ -93,30 +39,34 @@ namespace NGOTanks
         [ServerRpc]
         void ShootServerRpc()
         {
-            bullet b = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
+            bullet b = tank.Fire();
             b.init(OwnerClientId);
-            ShootClientRpc(bulletHole.position, bulletHole.rotation);
+            ShootClientRpc();
         }
+        #endregion
+
+        #region ClientRpc
         [ClientRpc]
-        void ShootClientRpc(Vector3 pos, Quaternion rot)
+        void ShootClientRpc()
         {
             if (!IsHost)
             {
-                bullet b = Instantiate(bulletPrefab, pos, rot);
+                bullet b = tank.Fire();
                 b.init(OwnerClientId);
             }
         }
         [ClientRpc]
         void killPlayerClientRpc(ulong killerID)
         {
-            isDead = true;
+            tank.Kill();
             if(IsLocalPlayer)
-                GetComponent<PlayerInput>().Disable();
+                tank.gameObject.GetComponent<PlayerInput>().Disable();
             Debug.Log($"Player:{pData.Value} killled by {NetworkingManager.Singleton.getPlayer(killerID).pData.Value}");
         }
+        #endregion
         void initPlayerNameUI()
         {
-            text_PlayerName.text = pData.Value.ToString();
+
         }
         public void TakeDamage(float damage, ulong bulletOwnerID)
         {
@@ -125,12 +75,45 @@ namespace NGOTanks
                 Debug.LogWarning("TakeDamage Should not called in client");
                 return;
             }
-            if (isDead) return;
+            if (tank.isDead) return;
             pHealth.Value -= damage;
             if (pHealth.Value <= 0)
             {
                 killPlayerClientRpc(NetworkingManager.Singleton.getPlayer(bulletOwnerID).OwnerClientId);
             }
+        }
+        public void spawnTank(Tank tankPrefab)
+        {
+            if (tank != null)
+            {
+                Debug.Log("there is already tank");
+                Destroy(tank.gameObject);
+            }
+            tank = Instantiate(tankPrefab, transform.position, Quaternion.identity);
+            if (IsLocalPlayer)
+            {
+                IA_Tank inputActions = new IA_Tank();
+                inputActions.Enable();
+                inputActions.Control.Fire.performed += ctx => ShootServerRpc();
+                tank.TankInit();
+            }
+        }
+        
+        public void changeTeam(Team newTeam)
+        {
+            PlayerData p = pData.Value;
+            p.playerTeam = newTeam;
+            pData.Value = p;
+        }
+        public void changeClass(Class newClass)
+        {
+            PlayerData p = pData.Value;
+            p.playerClass = newClass;
+            pData.Value = p;
+        }
+        public string getName()
+        {
+            return pData.Value.playerName.ToString();
         }
 
         public override void OnNetworkDespawn()
@@ -138,25 +121,8 @@ namespace NGOTanks
             base.OnNetworkDespawn();
             pData.OnValueChanged -= OnPlayerDataChanged;
             pHealth.OnValueChanged -= OnPlayerHealthChanged;
-
+            Destroy(tank.gameObject);
             NetworkingManager.Singleton.removePlayer(OwnerClientId);
         }
-
-        #region Inputs
-
-        void OnFire()
-        {
-            ShootServerRpc();
-        }
-        void OnMove(Vector2 move)
-        {
-            Vector3 movement = new Vector3(move.x, 0.0f, move.y);
-            rb.MovePosition(rb.position + movement * Time.deltaTime);
-        }
-        void OnRotateTorret(float rot)
-        {
-            cannonPivot.Rotate(Vector3.up * rot * rotationSpeed * Time.deltaTime);
-        }
-        #endregion
     }
 }

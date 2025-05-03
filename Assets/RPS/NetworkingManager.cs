@@ -17,7 +17,7 @@ namespace RPS
     {
         static new NetworkingManager singleton;
 
-        public static new NetworkingManager Singleton => singleton;
+        public static NetworkingManager Singleton => singleton;
 
         bool isServer;
         bool isClient;

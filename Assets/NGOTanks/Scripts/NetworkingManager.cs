@@ -36,7 +36,6 @@ namespace NGOTanks
             OnServerStarted += HandleServerStarted;
             OnClientConnectedCallback += HandleClientConnected;
         }
-
         private void HandleClientConnected(ulong clientID)
         {
 
@@ -49,6 +48,7 @@ namespace NGOTanks
 
         public void SpawnPlayer(ulong clientId)
         {
+            Debug.Log("Spawning player for client: " + clientId);
             NetworkObject netPlayer = Instantiate(playerPrefab);
             netPlayer.SpawnAsPlayerObject(clientId);
         }
@@ -62,6 +62,9 @@ namespace NGOTanks
         {
             if (netPlayers.ContainsKey(player.OwnerClientId)) return;
             netPlayers.Add(player.OwnerClientId, player);
+            if(!player.IsLocalPlayer)
+                UIManager.Singleton.AddPlayer(player.OwnerClientId, player.getName());
+
         }
 
         public NetworkPlayer getPlayer(ulong ID)
@@ -77,11 +80,22 @@ namespace NGOTanks
         public void removePlayer(ulong ID)
         {
             netPlayers.Remove(ID);
+            UIManager.Singleton.RemovePlayer(ID);
+        }
+
+        public void updatePlayerTeam(ulong ID,Team newTeam)
+        {
+            getPlayer(ID).changeTeam(newTeam);
+        }
+        public void updatePlayerClass(ulong ID, Class newClass)
+        {
+            getPlayer(ID).changeClass(newClass);
         }
         private void OnDestroy()
         {
             OnServerStarted -= HandleServerStarted;
             OnClientConnectedCallback -= HandleClientConnected;
         }
+
     }
 }
