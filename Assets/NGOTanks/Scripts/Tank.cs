@@ -66,7 +66,7 @@ namespace NGOTanks
             }
             isLocalTank = true;
             rb = GetComponent<Rigidbody>();
-            ownerID = player.OwnerClientId;
+            //ownerID = player.OwnerClientId;
             isDead = false;
             SubscripeToInput(player);
 
@@ -105,12 +105,16 @@ namespace NGOTanks
 
         public void UpdateHealth(float newHP)
         {
+            PlayerHealth.localScale = new Vector3(newHP / stats.MaxHealth, 1, 1);
             if(newHP <= 0)
             {
                 //TODO:Death function
                 return;
             }
-            PlayerHealth.localScale = new Vector3(newHP / stats.MaxHealth, 1, 1);
+        }
+        public void UpdateTankName(string pName)
+        {
+            text_PlayerName.text = pName;
         }
 
         public void Fire()

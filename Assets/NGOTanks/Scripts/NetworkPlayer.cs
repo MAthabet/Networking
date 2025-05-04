@@ -39,10 +39,10 @@ namespace NGOTanks
             NetworkObject tankObject = NetworkingManager.Singleton.SpawnManager.SpawnedObjects[tankID.Value];
             tank = tankObject.GetComponent<Tank>();
 
+            tank.SetOwnerId(OwnerClientId);
+            tank.UpdateTankName(GetPlayerName());
             if (IsLocalPlayer)
                 tank.TankInit(this);
-            else
-                tank.SetOwnerId(OwnerClientId);
         }
 
         private void OnPlayerReadyChanged(bool previousValue, bool newValue)
@@ -101,11 +101,23 @@ namespace NGOTanks
             }
         }
         [ClientRpc]
-        void killPlayerClientRpc(ulong killerID)
+        void KillPlayerClientRpc(ulong killerID)
         {
             tank.Kill();
             Debug.Log($"Player:{pData.Value.playerName} killled by {NetworkingManager.Singleton.GetPlayer(killerID).pData.Value.playerName}");
+            UIManager.Singleton.LogKill(NetworkingManager.Singleton.GetPlayer(killerID).GetPlayerName(), GetPlayerName());
         }
+        [ClientRpc]
+        void EndGameClientRpc(Team winnerTeam)
+        {
+            if (NetworkingManager.Singleton.LocalPlayerData.playerTeam == winnerTeam)
+                UIManager.Singleton.SetUpPopUpColor(Color.green);
+            else
+                UIManager.Singleton.SetUpPopUpColor(Color.red);
+
+            UIManager.Singleton.SendMsg($"Team {winnerTeam} Won");
+        }
+
         #endregion
         void UpdateOtherPlayersNameUI()
         {
@@ -131,9 +143,17 @@ namespace NGOTanks
             pHealth.Value -= damage;
             if (pHealth.Value <= 0)
             {
-                killPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(attackerID).OwnerClientId);
+                KillPlayer(attackerID);
             }
-        }        
+        }
+        private void KillPlayer(ulong attackerID)
+        {
+            KillPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(attackerID).OwnerClientId);
+            if(NetworkingManager.Singleton.IsAllTeamDead(GetTeam()))
+            {
+                EndGameClientRpc(GetTeam()==Team.Blue? Team.Brown:Team.Blue);
+            }
+        }
         public void ChangeTeam(Team newTeam)
         {
             PlayerData p = pData.Value;
@@ -171,6 +191,10 @@ namespace NGOTanks
         public Class GetClass()
         {
             return pData.Value.playerClass;
+        }
+        public float GetCurrentHP()
+        {
+            return pHealth.Value;
         }
         public bool IsReady()
         {

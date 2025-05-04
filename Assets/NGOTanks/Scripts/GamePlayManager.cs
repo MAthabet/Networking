@@ -29,8 +29,7 @@ namespace NGOTanks
 
             if(NetworkingManager.Singleton.IsHost)
             {
-                spawnPlayer(NetworkingManager.Singleton.LocalClientId);
-                
+                spawnPlayer(NetworkingManager.Singleton.LocalClientId);                
             }
         }
 

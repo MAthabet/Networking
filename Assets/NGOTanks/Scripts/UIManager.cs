@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace NGOTanks
 {
@@ -21,6 +22,10 @@ namespace NGOTanks
         [SerializeField] private TMP_InputField IF_PlayerName;
         [SerializeField] private Canvas MainMenuCanva;
         [SerializeField] private Canvas LobbyCanva;
+        [SerializeField] private Canvas InGameUI;
+        [SerializeField] private TMP_Text GameLog;
+        [SerializeField] private Canvas PopUp;
+        [SerializeField] private TMP_Text PopUpMsg;
         [SerializeField] private TMP_Dropdown DD_Team;
         [SerializeField] private TMP_Dropdown DD_Class;
         [SerializeField] private TMP_Text PlayerNameText;
@@ -34,6 +39,7 @@ namespace NGOTanks
         
 
         private Dictionary<ulong, TMP_Text> textMap = new Dictionary<ulong, TMP_Text>();
+        Coroutine currentPopupCoroutine;
         #endregion
         private void Awake()
         {
@@ -55,6 +61,7 @@ namespace NGOTanks
             MainMenuCanva.enabled = true;
             HostPanel.SetActive(false);
             LobbyCanva.enabled = false;
+            InGameUI.enabled = false;
 
             foreach (TMP_Text text in PlayersInLobbyText)
             {
@@ -68,15 +75,23 @@ namespace NGOTanks
         {
             if (sceneName == NetworkingManager.GameSceneName)
             {
-                DisableUi();
+                DisableMenus();
+                ClearLog();
+                InGameUI.enabled = true;
             }
+            else
+                InGameUI.enabled = false;
         }
 
-        public void DisableUi()
+        public void DisableMenus()
         {
             MainMenuCanva.enabled = false;
             HostPanel.SetActive(false);
             LobbyCanva.enabled = false;
+        }
+        public void InitializeInGameUI()
+        {
+            GameLog.text = "";
         }
 
         public void InitializeUI()
@@ -95,7 +110,8 @@ namespace NGOTanks
             {
                 text.text = "";
             }
-            
+
+            PopUp.enabled = false;
         }
         private void ChangeMainMenuButtonsInteraction(bool isInteractable)
         {
@@ -136,7 +152,7 @@ namespace NGOTanks
         {
             if(NetworkingManager.Singleton.IsAllPlayerReady() == false)
             {
-                Debug.Log("not all players are ready");
+                SendMsg("not all players are ready");
                 return;
             }
             if (NetworkingManager.Singleton.IsHost)
@@ -298,6 +314,41 @@ namespace NGOTanks
             }
             
 
+        }
+        public void LogKill(string killerName, string deadName)
+        {
+            GameLog.text += "\n" + killerName + " Killed " + deadName;
+        }
+        public void ClearLog()
+        {
+            GameLog.text = "";
+        }
+
+        public void SendMsg(string msg, float timer = 1.5f)
+        {
+            
+            PopUp.enabled = true;
+            if (currentPopupCoroutine != null)
+            {
+                StopCoroutine(currentPopupCoroutine);
+                PopUpMsg.text += "\n";
+                PopUpMsg.text += msg;
+            }
+            else
+                PopUpMsg.text = msg;
+            
+            StartCoroutine(HidePopUp(timer));
+        }
+        public void SetUpPopUpColor(Color color)
+        {
+            PopUpMsg.color = color;
+        }
+        IEnumerator HidePopUp(float waitTime)
+        {
+            yield return new WaitForSeconds(waitTime);
+            PopUpMsg.text = "";
+            PopUp.enabled = false;
+            currentPopupCoroutine = null;
         }
     }
 }

@@ -135,5 +135,16 @@ namespace NGOTanks
         {
             GetPlayer(localClientId).ChangeReadyState(isReady);
         }
+        public bool IsAllTeamDead(Team team)
+        {
+            foreach (var player in netPlayers)
+            {
+                if (player.Value.GetTeam() == team && player.Value.GetCurrentHP() > 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }
