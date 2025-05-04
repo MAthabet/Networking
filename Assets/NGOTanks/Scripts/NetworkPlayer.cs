@@ -40,9 +40,9 @@ namespace NGOTanks
             tank = tankObject.GetComponent<Tank>();
 
             if (IsLocalPlayer)
-            {
                 tank.TankInit(this);
-            }
+            else
+                tank.SetOwnerId(OwnerClientId);
         }
 
         private void OnPlayerReadyChanged(bool previousValue, bool newValue)
@@ -80,8 +80,7 @@ namespace NGOTanks
         [ServerRpc]
         public void ShootServerRpc()
         {
-            bullet b = tank.Fire();
-            b.init(OwnerClientId);
+            tank.Fire();
             ShootClientRpc();
         }
         [ServerRpc]
@@ -98,17 +97,14 @@ namespace NGOTanks
         {
             if (!IsHost)
             {
-                bullet b = tank.Fire();
-                b.init(OwnerClientId);
+                tank.Fire();
             }
         }
         [ClientRpc]
         void killPlayerClientRpc(ulong killerID)
         {
             tank.Kill();
-            if(IsLocalPlayer)
-                tank.gameObject.GetComponent<PlayerInput>().Disable();
-            Debug.Log($"Player:{pData.Value} killled by {NetworkingManager.Singleton.GetPlayer(killerID).pData.Value}");
+            Debug.Log($"Player:{pData.Value.playerName} killled by {NetworkingManager.Singleton.GetPlayer(killerID).pData.Value.playerName}");
         }
         #endregion
         void UpdateOtherPlayersNameUI()
@@ -124,7 +120,7 @@ namespace NGOTanks
             UIManager.Singleton.UpdatePlayerClass(OwnerClientId, pData.Value.playerClass);
         }
 
-        public void TakeDamage(float damage, ulong bulletOwnerID)
+        public void TakeDamage(float damage, ulong attackerID)
         {
             if(!IsServer)
             {
@@ -135,7 +131,7 @@ namespace NGOTanks
             pHealth.Value -= damage;
             if (pHealth.Value <= 0)
             {
-                killPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(bulletOwnerID).OwnerClientId);
+                killPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(attackerID).OwnerClientId);
             }
         }        
         public void ChangeTeam(Team newTeam)

@@ -20,6 +20,7 @@ namespace NGOTanks
 
 
         [SerializeField] List<SpawnPoint> spawnPoints;
+        bool isFriendlyFireOn;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
@@ -45,8 +46,8 @@ namespace NGOTanks
             if (NetworkingManager.Singleton.IsServer)
             {
                 NetworkPlayer player = NetworkingManager.Singleton.GetPlayer(clientId);
-                GameObject tankPrefab;
-                Transform pos = getSpawnPointAndTankprefab(player.GetTeam(), player.GetClass(),out tankPrefab);
+                
+                Transform pos = getSpawnPointAndTankprefab(player.GetTeam(), player.GetClass(), out GameObject tankPrefab);
 
                 GameObject instance = Instantiate(tankPrefab, pos.position, Quaternion.identity);
                 NetworkObject obj = instance.GetComponent<NetworkObject>();

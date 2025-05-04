@@ -27,6 +27,7 @@ namespace NGOTanks
         [SerializeField] private GameObject HostPanel;
         [SerializeField] private GameObject ClientPanel;
         [SerializeField] private Toggle friendlyFire;
+        [SerializeField] private Toggle friendlyFireClientIndecator;
         [SerializeField] private Toggle Ready;
         [SerializeField] private List<TMP_Text> PlayersInLobbyText;
         [SerializeField] private List<Button> StartBtns;
@@ -63,7 +64,7 @@ namespace NGOTanks
             ChangeMainMenuButtonsInteraction(false);
         }
 
-        private void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+        public void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
         {
             if (sceneName == NetworkingManager.GameSceneName)
             {
@@ -108,14 +109,16 @@ namespace NGOTanks
         public void OnStartServerClicked()
         {
             NetworkingManager.Singleton.StartServer();
-            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
+
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += UIManager.Singleton.OnSceneLoadComplete;
         }
 
         public void OnStartHostClicked()
         {
             GetName();
             NetworkingManager.Singleton.StartHost();
-            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
+
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += UIManager.Singleton.OnSceneLoadComplete;
             LobbyStarted(true);
 
         }
@@ -124,7 +127,8 @@ namespace NGOTanks
         {
             GetName();
             NetworkingManager.Singleton.StartClient();
-            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
+
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += UIManager.Singleton.OnSceneLoadComplete;
             LobbyStarted(false);
         }
 
@@ -167,11 +171,34 @@ namespace NGOTanks
                 NetworkingManager.Singleton.UpdatePlayerReadyState(NetworkingManager.Singleton.LocalClientId, false);
             }
         }
+        public void OnFriendlyFireClicked()
+        {
+            if (friendlyFire.isOn)
+            {
+                GameSettings.Singelton.SetFriendlyFireServerRpc(true);
+            }
+            else
+            {
+                GameSettings.Singelton.SetFriendlyFireServerRpc(false);
+            }
+        }
         #endregion
 
         public void GetName()
         {
             NetworkingManager.Singleton.UpdatePlayerName(IF_PlayerName.text);
+        }
+
+        public void UpdatefriendlyFireClientIndecator(bool on)
+        {
+            if (on)
+            {
+                friendlyFireClientIndecator.isOn = true;
+            }
+            else
+            {
+                friendlyFireClientIndecator.isOn = false;
+            }
         }
 
         public void LobbyStarted(bool isHost)

@@ -1329,7 +1329,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.8, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3336375498499430275}
@@ -1357,8 +1357,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8766278, y: 0.7036743, z: 1.0664315}
-  m_Center: {x: 0.00000011920929, y: 0.017915487, z: 0.061686218}
+  m_Size: {x: 0.8766278, y: 0.59341764, z: 0.98046327}
+  m_Center: {x: 0, y: 0.02686536, z: 0.042984128}
 --- !u!114 &6080838890429990551
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1475,6 +1475,7 @@ MonoBehaviour:
   PlayerHealth: {fileID: 1858743117310962684}
   HUDRoot: {fileID: 3336375498499430275}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
+  ownerID: 0
 --- !u!114 &1228129124890193063
 MonoBehaviour:
   m_ObjectHideFlags: 0

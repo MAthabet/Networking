@@ -13,7 +13,7 @@ namespace NGOTanks
         [SerializeField] TextMeshProUGUI text_PlayerName;
         [SerializeField] Transform PlayerHealth;
         [SerializeField] Transform HUDRoot;
-        [SerializeField] bullet bulletPrefab;
+        [SerializeField] Bullet bulletPrefab;
 
 
         Transform cam;
@@ -24,6 +24,7 @@ namespace NGOTanks
         float rot;
         public bool isDead { get; private set; }
         bool isLocalTank;
+        ulong ownerID;
 
         IA_Tank inputActions;
 
@@ -65,12 +66,20 @@ namespace NGOTanks
             }
             isLocalTank = true;
             rb = GetComponent<Rigidbody>();
-            
+            ownerID = player.OwnerClientId;
             isDead = false;
             SubscripeToInput(player);
 
             player.InitpHealthServerRpc(stats.MaxHealth);
 
+        }
+        public void SetOwnerId(ulong id)
+        {
+            ownerID = id;
+        }
+        public ulong GetOwnerID()
+        {
+            return ownerID;
         }
 
         #region helper functions
@@ -104,9 +113,11 @@ namespace NGOTanks
             PlayerHealth.localScale = new Vector3(newHP / stats.MaxHealth, 1, 1);
         }
 
-        public bullet Fire()
+        public void Fire()
         {
-            return Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
+            if (isDead) return;
+            Bullet bullet = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
+            bullet.init(ownerID, stats.damage);
         }
         public void Kill()
         {

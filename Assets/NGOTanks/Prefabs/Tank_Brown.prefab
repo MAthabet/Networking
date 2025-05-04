@@ -91,8 +91,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 14.647172, y: 4.42298, z: 10.230957}
-  m_Center: {x: 0.059701998, y: 2.2687175, z: -0.041359264}
+  m_Size: {x: 14.647172, y: 3.963579, z: 10.230957}
+  m_Center: {x: 0.059701797, y: 2.4984188, z: -0.041359067}
 --- !u!54 &7227856977933828382
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -209,6 +209,7 @@ MonoBehaviour:
   PlayerHealth: {fileID: 2112023760148428934}
   HUDRoot: {fileID: 2615455381528092188}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
+  ownerID: 0
 --- !u!114 &2534041809062168002
 MonoBehaviour:
   m_ObjectHideFlags: 0

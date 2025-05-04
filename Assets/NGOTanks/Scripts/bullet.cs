@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace NGOTanks
 {
-    public class bullet : MonoBehaviour
+    public class Bullet : MonoBehaviour
     {
         [SerializeField] float speed;
-        [SerializeField] float damage;
+        float damage;
 
         ulong ownerID;
         Rigidbody rb;
@@ -23,9 +23,10 @@ namespace NGOTanks
         
         }
 
-        public void init(ulong ID)
+        public void init(ulong _ownerID, float _damage)
         {
-            ownerID = ID;
+            ownerID = _ownerID;
+            damage = _damage;
         }
 
         private void OnTriggerEnter(Collider other)
@@ -34,9 +35,29 @@ namespace NGOTanks
             {
                 if(other.CompareTag("Tank"))
                 {
-                    if(other.TryGetComponent<NetworkPlayer>(out NetworkPlayer netPlayer))
+                    Debug.Log("collider :" + other.gameObject.name);
+                    if(other.TryGetComponent<Tank>(out Tank tank))
                     {
-                        netPlayer.TakeDamage(damage, ownerID);
+                        
+                        NetworkPlayer netPlayer = NetworkingManager.Singleton.GetPlayer(tank.GetOwnerID());
+                        Debug.Log("tank name: " + tank.gameObject.name) ;
+                        Debug.Log($"Bullet {ownerID} hit {tank.GetOwnerID()}");
+                        if (GameSettings.Singelton.IsFriendlyFireOn())
+                        {
+                            netPlayer.TakeDamage(damage, ownerID);
+                        }
+                        else 
+                        {
+                            Team bulletTeam = NetworkingManager.Singleton.GetPlayer(ownerID).GetTeam();
+                            Team tankTeam = netPlayer.GetTeam();
+                            if (bulletTeam != tankTeam)
+                                netPlayer.TakeDamage(damage, ownerID);
+                            else
+                            {
+                                //bullet to go thru teammate
+                                return;
+                            }
+                        }
                     }
                 }
             }

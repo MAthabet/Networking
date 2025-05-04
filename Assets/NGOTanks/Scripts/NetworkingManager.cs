@@ -1,6 +1,7 @@
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using System;
 
 namespace NGOTanks
@@ -21,6 +22,8 @@ namespace NGOTanks
         }
 
         [SerializeField] private NetworkObject playerPrefab;
+        [SerializeField] private GameObject gameSettingsPrefab;
+
         private Dictionary<ulong, NetworkPlayer> netPlayers = new Dictionary<ulong, NetworkPlayer>();
 
         private void Awake()
@@ -48,7 +51,19 @@ namespace NGOTanks
 
         private void HandleServerStarted()
         {
-            SceneManager.LoadScene(LobbySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+            Singleton.SceneManager.OnLoadComplete += OnLobbySceneLoaded;
+            SceneManager.LoadScene(LobbySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);            
+        }
+
+        private void OnLobbySceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+        {
+            if (Singleton.IsServer && sceneName == LobbySceneName)
+            {
+                GameObject gameSettings = Instantiate(gameSettingsPrefab);
+                gameSettings.GetComponent<NetworkObject>().Spawn();
+
+                Singleton.SceneManager.OnLoadComplete -= OnLobbySceneLoaded;
+            }
         }
 
         public void SpawnPlayer(ulong clientId)
