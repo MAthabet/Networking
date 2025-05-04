@@ -69,7 +69,7 @@ namespace NGOTanks
             netPlayers.Add(player.OwnerClientId, player);
             if (!player.IsLocalPlayer)
             {
-                UIManager.Singleton.AddPlayer(player.OwnerClientId, player.GetName());
+                UIManager.Singleton.AddPlayer(player.OwnerClientId, player.GetPlayerName());
             }
 
         }

@@ -1,5 +1,6 @@
 using TMPro;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,17 +15,24 @@ namespace NGOTanks
         [SerializeField] Transform HUDRoot;
         [SerializeField] bullet bulletPrefab;
 
+
         Transform cam;
         Rigidbody rb;
+        TankStats stats;
+
+        Vector3 movement;
+        float rot;
         public bool isDead { get; private set; }
+        bool isLocalTank;
 
-        float MaxHealth;
-        float speed;
-        float rotationSpeed;
-        float damage;
+        IA_Tank inputActions;
 
-        private InputActionMap IAM;
-
+        private void Awake()
+        {
+            inputActions = new IA_Tank();
+            cam = Camera.main.transform;
+            stats = GetComponent<TankStatsData>().tankStats;
+        }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
@@ -34,29 +42,66 @@ namespace NGOTanks
         // Update is called once per frame
         void Update()
         {
+            HUDRoot.LookAt(cam);
+
             if (isDead)
             {
                 return;
             }
-            if(cam)
-                HUDRoot.LookAt(cam);
+            
+            if (!isLocalTank) return;
+
+            if(movement != Vector3.zero)
+                rb.MovePosition(rb.position + movement * stats.speed * Time.deltaTime);
+            if(rot != 0)
+                cannonPivot.Rotate(Vector3.up * rot * stats.rotationSpeed * Time.deltaTime);
         }
-        public void TankInit()
+        public void TankInit(NetworkPlayer player)
         {
+            if (!player.IsLocalPlayer)
+            {
+                Debug.LogWarning("Tank init on not local player");
+                return;
+            }
+            isLocalTank = true;
             rb = GetComponent<Rigidbody>();
-            cam = Camera.main.transform;
-            GetComponent<PlayerInput>().Enable();
+            
             isDead = false;
-            
-            IA_Tank inputActions = new IA_Tank();
-            inputActions.Control.MoveTank.performed += OnMove;
-            inputActions.Control.RotateTorret.performed += OnRotateTorret;
-            
+            SubscripeToInput(player);
+
+            player.InitpHealthServerRpc(stats.MaxHealth);
+
         }
+
+        #region helper functions
+        private void SubscripeToInput(NetworkPlayer player)
+        {
+            inputActions.Enable();
+            inputActions.Control.MoveTank.started += OnMove;
+            inputActions.Control.MoveTank.canceled += OnMove;
+            inputActions.Control.RotateTorret.started += OnRotateTorret;
+            inputActions.Control.RotateTorret.canceled += OnRotateTorret;
+            inputActions.Control.Fire.performed +=
+                ctx => player.ShootServerRpc();
+        }
+        private void UnsubscripeToInput()
+        {
+            inputActions.Disable();
+            inputActions.Control.MoveTank.started -= OnMove;
+            inputActions.Control.MoveTank.canceled -= OnMove;
+            inputActions.Control.RotateTorret.started -= OnRotateTorret;
+            inputActions.Control.RotateTorret.canceled -= OnRotateTorret;
+        }
+        #endregion
 
         public void UpdateHealth(float newHP)
         {
-            PlayerHealth.localScale = new Vector3(newHP / MaxHealth, 1, 1);
+            if(newHP <= 0)
+            {
+                //TODO:Death function
+                return;
+            }
+            PlayerHealth.localScale = new Vector3(newHP / stats.MaxHealth, 1, 1);
         }
 
         public bullet Fire()
@@ -77,14 +122,20 @@ namespace NGOTanks
         void OnMove(InputAction.CallbackContext context)
         {
             Vector2 move = context.ReadValue<Vector2>();
-            Vector3 movement = new Vector3(move.x, 0.0f, move.y);
-            rb.MovePosition(rb.position + movement * Time.deltaTime);
+            movement = new Vector3(move.x, 0.0f, move.y);
         }
         void OnRotateTorret(InputAction.CallbackContext context)
         {
-            float rot = context.ReadValue<float>();
-            cannonPivot.Rotate(Vector3.up * rot * rotationSpeed * Time.deltaTime);
+            rot = context.ReadValue<float>();
         }
         #endregion
+        private void OnDisable()
+        {
+            UnsubscripeToInput();
+        }
+        private void OnDestroy()
+        {
+            UnsubscripeToInput();
+        }
     }
 }

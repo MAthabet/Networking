@@ -2,12 +2,15 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.InputSystem;
 using System;
+using NUnit.Framework.Internal.Commands;
 
 namespace NGOTanks
 {
     public class NetworkPlayer : NetworkBehaviour
     {
         Tank tank;
+
+        NetworkVariable<ulong> tankID = new NetworkVariable<ulong>();
         NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>(new PlayerData("", Team.None, Class.None));
         NetworkVariable<float> pHealth = new NetworkVariable<float>(0);
         NetworkVariable<bool> pIsReady = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
@@ -16,13 +19,30 @@ namespace NGOTanks
         {
             base.OnNetworkSpawn();
 
+            tankID.OnValueChanged += OnTankIDChanged;
             pData.OnValueChanged += OnPlayerDataChanged;
             pHealth.OnValueChanged += OnPlayerHealthChanged;
             pIsReady.OnValueChanged += OnPlayerReadyChanged;
 
             if (IsLocalPlayer)
+            {
+                if (IsHost)
+                    pIsReady.Value = true;
                 ChangeName(NetworkingManager.Singleton.LocalPlayerData.playerName.ToString());
+                DontDestroyOnLoad(gameObject);
+            }
             NetworkingManager.Singleton.AddPlayer(this);
+        }
+
+        private void OnTankIDChanged(ulong previousValue, ulong newValue)
+        {
+            NetworkObject tankObject = NetworkingManager.Singleton.SpawnManager.SpawnedObjects[tankID.Value];
+            tank = tankObject.GetComponent<Tank>();
+
+            if (IsLocalPlayer)
+            {
+                tank.TankInit(this);
+            }
         }
 
         private void OnPlayerReadyChanged(bool previousValue, bool newValue)
@@ -34,6 +54,8 @@ namespace NGOTanks
         {
             if (tank)
                 tank.UpdateHealth(newValue);
+            else
+                Debug.LogWarning("Tank is null");
         }
         private void OnPlayerDataChanged(PlayerData previousValue, PlayerData newValue)
         {
@@ -47,6 +69,8 @@ namespace NGOTanks
         }
 
         #region ServerRpc
+        
+        
         [ServerRpc]
         void UpdatePlayerDataServerRpc(PlayerData value)
         {
@@ -54,12 +78,18 @@ namespace NGOTanks
         }
 
         [ServerRpc]
-        void ShootServerRpc()
+        public void ShootServerRpc()
         {
             bullet b = tank.Fire();
             b.init(OwnerClientId);
             ShootClientRpc();
         }
+        [ServerRpc]
+        public void InitpHealthServerRpc(float health)
+        {
+            pHealth.Value = health;
+        }
+        //TODO: player request spawn to server so late join to be an option
         #endregion
 
         #region ClientRpc
@@ -91,7 +121,6 @@ namespace NGOTanks
         }
         void UpdateOtherPlayersClassUI()
         {
-            Debug.Log("called");
             UIManager.Singleton.UpdatePlayerClass(OwnerClientId, pData.Value.playerClass);
         }
 
@@ -108,24 +137,7 @@ namespace NGOTanks
             {
                 killPlayerClientRpc(NetworkingManager.Singleton.GetPlayer(bulletOwnerID).OwnerClientId);
             }
-        }
-        public void SpawnTank(Tank tankPrefab)
-        {
-            if (tank != null)
-            {
-                Debug.Log("there is already tank");
-                Destroy(tank.gameObject);
-            }
-            tank = Instantiate(tankPrefab, transform.position, Quaternion.identity);
-            if (IsLocalPlayer)
-            {
-                IA_Tank inputActions = new IA_Tank();
-                inputActions.Enable();
-                inputActions.Control.Fire.performed += ctx => ShootServerRpc();
-                tank.TankInit();
-            }
-        }
-        
+        }        
         public void ChangeTeam(Team newTeam)
         {
             PlayerData p = pData.Value;
@@ -148,7 +160,11 @@ namespace NGOTanks
         {
             pIsReady.Value = isReady;
         }
-        public string GetName()
+        public void ChangeTankID(ulong id)
+        {
+            tankID.Value = id;
+        }
+        public string GetPlayerName()
         {
             return pData.Value.playerName.ToString();
         }

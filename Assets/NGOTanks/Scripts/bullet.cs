@@ -13,7 +13,7 @@ namespace NGOTanks
         void Start()
         {
             rb = GetComponent<Rigidbody>();
-            rb.AddForce(-transform.up * speed, ForceMode.Impulse);
+            rb.AddForce(transform.forward * speed, ForceMode.Impulse);
             Destroy(gameObject, 3f);
         }
 

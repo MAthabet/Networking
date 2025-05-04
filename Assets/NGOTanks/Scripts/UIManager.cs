@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace NGOTanks
@@ -60,7 +62,16 @@ namespace NGOTanks
 
             ChangeMainMenuButtonsInteraction(false);
         }
-        private void DisableUi()
+
+        private void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+        {
+            if (sceneName == NetworkingManager.GameSceneName)
+            {
+                DisableUi();
+            }
+        }
+
+        public void DisableUi()
         {
             MainMenuCanva.enabled = false;
             HostPanel.SetActive(false);
@@ -97,12 +108,14 @@ namespace NGOTanks
         public void OnStartServerClicked()
         {
             NetworkingManager.Singleton.StartServer();
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
         }
 
         public void OnStartHostClicked()
         {
             GetName();
             NetworkingManager.Singleton.StartHost();
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
             LobbyStarted(true);
 
         }
@@ -111,6 +124,7 @@ namespace NGOTanks
         {
             GetName();
             NetworkingManager.Singleton.StartClient();
+            NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
             LobbyStarted(false);
         }
 
@@ -210,7 +224,6 @@ namespace NGOTanks
 
         public void UpdatePlayerName(ulong id, string name)
         {
-            Debug.Log("name" + NetworkingManager.Singleton.GetPlayer(id).IsLocalPlayer);
             if (textMap.ContainsKey(id))
             {
                 textMap[id].text = name;
@@ -224,7 +237,6 @@ namespace NGOTanks
         {
             if (textMap.ContainsKey(id))
             {
-                Debug.Log(textMap[id].text + " " + team.ToString() + " " + id);
                 switch (team)
                 {
                     case Team.None:
@@ -247,8 +259,6 @@ namespace NGOTanks
             {
                 string[] parts = textMap[id].text.Split('(');
                 string name = parts[0];
-                Debug.Log("Full name: " + textMap[id].text);
-                Debug.Log("name: " + parts[0]);
                 if (playerClass != Class.None)
                 {
                     string className = playerClass.ToString();
