@@ -2,6 +2,11 @@ using UnityEngine;
 
 namespace NGOTanks
 {
+    public enum Abilities
+    {
+        Lightning,
+        Healing
+    }
     [CreateAssetMenu(fileName = "TankStats", menuName = "Scriptable Objects/TankStats")]
     public class TankStats : ScriptableObject
     {
@@ -10,5 +15,8 @@ namespace NGOTanks
         public float speed;
         public float rotationSpeed;
         public float damage;
+        public Abilities ability;
+        public GameObject abilityPrefab;
+        public float abilityCooldown;
     }
 }

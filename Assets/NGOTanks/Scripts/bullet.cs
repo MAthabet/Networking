@@ -17,13 +17,7 @@ namespace NGOTanks
             Destroy(gameObject, 3f);
         }
 
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
-
-        public void init(ulong _ownerID, float _damage)
+        public void Init(ulong _ownerID, float _damage)
         {
             ownerID = _ownerID;
             damage = _damage;
@@ -37,8 +31,7 @@ namespace NGOTanks
                 {
                     Debug.Log("collider :" + other.gameObject.name);
                     if(other.TryGetComponent<Tank>(out Tank tank))
-                    {
-                        
+                    {                        
                         NetworkPlayer netPlayer = NetworkingManager.Singleton.GetPlayer(tank.GetOwnerID());
                         Debug.Log("tank name: " + tank.gameObject.name) ;
                         Debug.Log($"Bullet {ownerID} hit {tank.GetOwnerID()}");

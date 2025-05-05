@@ -19,9 +19,11 @@ namespace NGOTanks
         Transform cam;
         Rigidbody rb;
         TankStats stats;
+        GameObject abilityPrefab;
 
         Vector3 movement;
         float rot;
+        float NextAbilityTime;
         public bool isDead { get; private set; }
         bool isLocalTank;
         ulong ownerID;
@@ -37,7 +39,7 @@ namespace NGOTanks
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
-            
+            NextAbilityTime = Time.time;
         }
 
         // Update is called once per frame
@@ -71,7 +73,6 @@ namespace NGOTanks
             SubscripeToInput(player);
 
             player.InitpHealthServerRpc(stats.MaxHealth);
-
         }
         public void SetOwnerId(ulong id)
         {
@@ -92,6 +93,8 @@ namespace NGOTanks
             inputActions.Control.RotateTorret.canceled += OnRotateTorret;
             inputActions.Control.Fire.performed +=
                 ctx => player.ShootServerRpc();
+            inputActions.Control.UseAbility.performed +=
+                ctx => player.UseAbilityServerRpc();
         }
         private void UnsubscripeToInput()
         {
@@ -121,7 +124,25 @@ namespace NGOTanks
         {
             if (isDead) return;
             Bullet bullet = Instantiate(bulletPrefab, bulletHole.position, bulletHole.rotation);
-            bullet.init(ownerID, stats.damage);
+            bullet.Init(ownerID, stats.damage);
+        }
+        public bool UseAbility()
+        {
+            if (isDead) return false;
+            if (Time.time < NextAbilityTime) return false;
+
+            GameObject abilityGO = Instantiate(stats.abilityPrefab, transform.position, Quaternion.identity);
+            switch(stats.ability)
+            {
+                case Abilities.Lightning:
+                    abilityGO.GetComponent<LightningAbility>().InitOwner(ownerID);
+                    break;
+                case Abilities.Healing:
+                    abilityGO.GetComponent<HealingAbility>().InitOwner(ownerID);
+                    break;
+            }
+            NextAbilityTime = Time.time + stats.abilityCooldown;
+            return true;
         }
         public void Kill()
         {

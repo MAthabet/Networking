@@ -17,3 +17,5 @@ MonoBehaviour:
   speed: 7
   rotationSpeed: 30
   damage: 10
+  abilityPrefab: {fileID: 8564608024345558901, guid: 065df93b6f5d6d84c80d4d71c64b8f52, type: 3}
+  abilityCooldown: 10

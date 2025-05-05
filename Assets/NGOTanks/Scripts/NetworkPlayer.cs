@@ -8,12 +8,15 @@ namespace NGOTanks
 {
     public class NetworkPlayer : NetworkBehaviour
     {
-        Tank tank;
 
         NetworkVariable<ulong> tankID = new NetworkVariable<ulong>();
         NetworkVariable<PlayerData> pData = new NetworkVariable<PlayerData>(new PlayerData("", Team.None, Class.None));
         NetworkVariable<float> pHealth = new NetworkVariable<float>(0);
         NetworkVariable<bool> pIsReady = new NetworkVariable<bool>(false,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Owner);
+
+        //just referance to save calls to tank
+        Tank tank;
+        float maxHealth;
 
         public override void OnNetworkSpawn()
         {
@@ -84,9 +87,16 @@ namespace NGOTanks
             ShootClientRpc();
         }
         [ServerRpc]
-        public void InitpHealthServerRpc(float health)
+        public void UseAbilityServerRpc()
         {
-            pHealth.Value = health;
+            if(tank.UseAbility())
+                UseAbilityClientRpc();
+        }
+        [ServerRpc]
+        public void InitpHealthServerRpc(float _maxHP)
+        {
+            pHealth.Value = _maxHP;
+            maxHealth = _maxHP;
         }
         //TODO: player request spawn to server so late join to be an option
         #endregion
@@ -96,9 +106,13 @@ namespace NGOTanks
         void ShootClientRpc()
         {
             if (!IsHost)
-            {
                 tank.Fire();
-            }
+        }
+        [ClientRpc]
+        void UseAbilityClientRpc()
+        {
+            if (!IsHost)
+                tank.UseAbility();
         }
         [ClientRpc]
         void KillPlayerClientRpc(ulong killerID)
@@ -140,11 +154,21 @@ namespace NGOTanks
                 return;
             }
             if (tank.isDead) return;
-            pHealth.Value -= damage;
-            if (pHealth.Value <= 0)
+            pHealth.Value = Mathf.Clamp(pHealth.Value - damage, 0, maxHealth);
+            if (pHealth.Value == 0)
             {
                 KillPlayer(attackerID);
             }
+        }
+        public void Heal(float healAmount)
+        {
+            if (!IsServer)
+            {
+                Debug.LogWarning("Heal Should not called in client");
+                return;
+            }
+            if (tank.isDead) return;
+            pHealth.Value = Mathf.Clamp(pHealth.Value + healAmount, 0, maxHealth);
         }
         private void KillPlayer(ulong attackerID)
         {

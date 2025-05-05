@@ -53,6 +53,15 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""UseAbility"",
+                    ""type"": ""Button"",
+                    ""id"": ""e53ac280-0a80-4ad1-af46-935386239588"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -154,6 +163,17 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
                     ""action"": ""Fire"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f4dd6e1f-c0c7-4c97-868e-a29c8f8c48d3"",
+                    ""path"": ""<Keyboard>/leftShift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""UseAbility"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -165,6 +185,7 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
         m_Control_MoveTank = m_Control.FindAction("MoveTank", throwIfNotFound: true);
         m_Control_RotateTorret = m_Control.FindAction("RotateTorret", throwIfNotFound: true);
         m_Control_Fire = m_Control.FindAction("Fire", throwIfNotFound: true);
+        m_Control_UseAbility = m_Control.FindAction("UseAbility", throwIfNotFound: true);
     }
 
     ~@IA_Tank()
@@ -234,6 +255,7 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
     private readonly InputAction m_Control_MoveTank;
     private readonly InputAction m_Control_RotateTorret;
     private readonly InputAction m_Control_Fire;
+    private readonly InputAction m_Control_UseAbility;
     public struct ControlActions
     {
         private @IA_Tank m_Wrapper;
@@ -241,6 +263,7 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
         public InputAction @MoveTank => m_Wrapper.m_Control_MoveTank;
         public InputAction @RotateTorret => m_Wrapper.m_Control_RotateTorret;
         public InputAction @Fire => m_Wrapper.m_Control_Fire;
+        public InputAction @UseAbility => m_Wrapper.m_Control_UseAbility;
         public InputActionMap Get() { return m_Wrapper.m_Control; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -259,6 +282,9 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
             @Fire.started += instance.OnFire;
             @Fire.performed += instance.OnFire;
             @Fire.canceled += instance.OnFire;
+            @UseAbility.started += instance.OnUseAbility;
+            @UseAbility.performed += instance.OnUseAbility;
+            @UseAbility.canceled += instance.OnUseAbility;
         }
 
         private void UnregisterCallbacks(IControlActions instance)
@@ -272,6 +298,9 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
             @Fire.started -= instance.OnFire;
             @Fire.performed -= instance.OnFire;
             @Fire.canceled -= instance.OnFire;
+            @UseAbility.started -= instance.OnUseAbility;
+            @UseAbility.performed -= instance.OnUseAbility;
+            @UseAbility.canceled -= instance.OnUseAbility;
         }
 
         public void RemoveCallbacks(IControlActions instance)
@@ -294,5 +323,6 @@ public partial class @IA_Tank: IInputActionCollection2, IDisposable
         void OnMoveTank(InputAction.CallbackContext context);
         void OnRotateTorret(InputAction.CallbackContext context);
         void OnFire(InputAction.CallbackContext context);
+        void OnUseAbility(InputAction.CallbackContext context);
     }
 }
