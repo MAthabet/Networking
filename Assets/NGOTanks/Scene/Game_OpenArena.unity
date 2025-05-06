@@ -222,16 +222,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 567328276}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: 0, z: 2}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2, y: 0, z: 4}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1378348753}
   - {fileID: 908061742}
   - {fileID: 2115260251}
   - {fileID: 1047895241}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1812326583}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &593970106
 GameObject:
@@ -415,7 +415,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: -1
   m_CullingMask:
@@ -440,13 +440,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 736012623}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.33757892, y: -0.28987628, z: 0.11013142, w: 0.88875383}
-  m_LocalPosition: {x: -0.308286, y: 1.8464541, z: -2.6793952}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 4.73, y: 14.848265, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &736012627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -933,8 +933,8 @@ Transform:
   m_GameObject: {fileID: 1812326582}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1933299023}
@@ -942,6 +942,7 @@ Transform:
   - {fileID: 887554918}
   - {fileID: 996308382}
   - {fileID: 1833605779}
+  - {fileID: 567328277}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1833605775
@@ -1344,6 +1345,5 @@ SceneRoots:
   - {fileID: 736012626}
   - {fileID: 593970108}
   - {fileID: 1812326583}
-  - {fileID: 567328277}
   - {fileID: 2252810372535628281}
   - {fileID: 419165429}
