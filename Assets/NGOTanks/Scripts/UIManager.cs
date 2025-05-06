@@ -36,7 +36,9 @@ namespace NGOTanks
         [SerializeField] private Toggle Ready;
         [SerializeField] private List<TMP_Text> PlayersInLobbyText;
         [SerializeField] private List<Button> StartBtns;
-        
+        [SerializeField] private RawImage ArenaImg;
+        [SerializeField] private List<Texture> ArenaImgs;
+        private int currentIndx = 0;
 
         private Dictionary<ulong, TMP_Text> textMap = new Dictionary<ulong, TMP_Text>();
         Coroutine currentPopupCoroutine;
@@ -73,7 +75,7 @@ namespace NGOTanks
 
         public void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
         {
-            if (sceneName == NetworkingManager.GameSceneName)
+            if (sceneName.Contains(NetworkingManager.GameSceneIdentifer))
             {
                 DisableMenus();
                 ClearLog();
@@ -112,6 +114,7 @@ namespace NGOTanks
             }
 
             PopUp.enabled = false;
+            ArenaImg.texture = ArenaImgs[currentIndx];
         }
         private void ChangeMainMenuButtonsInteraction(bool isInteractable)
         {
@@ -153,11 +156,13 @@ namespace NGOTanks
             if(NetworkingManager.Singleton.IsAllPlayerReady() == false)
             {
                 SendMsg("not all players are ready");
+                Debug.Log("not all players are ready");
                 return;
             }
+            else { Debug.Log("all players are ready"); }
             if (NetworkingManager.Singleton.IsHost)
             {
-                NetworkingManager.Singleton.SceneManager.LoadScene(NetworkingManager.GameSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+                NetworkingManager.Singleton.LoadGameScene(currentIndx);
             }
         }
         public void OnIFValueChanged()
@@ -191,15 +196,29 @@ namespace NGOTanks
         {
             if (friendlyFire.isOn)
             {
-                GameSettings.Singelton.SetFriendlyFireServerRpc(true);
+                GameSettings.Singleton.SetFriendlyFireServerRpc(true);
             }
             else
             {
-                GameSettings.Singelton.SetFriendlyFireServerRpc(false);
+                GameSettings.Singleton.SetFriendlyFireServerRpc(false);
             }
         }
         #endregion
 
+        public void ChangeArenaIndx(int increment)
+        {
+            currentIndx = (currentIndx + increment + ArenaImgs.Count) % ArenaImgs.Count;
+            if(NetworkingManager.Singleton.IsHost)
+            {
+                ChangeArenaImg(currentIndx);
+                GameSettings.Singleton.UpdateIndx(currentIndx);
+            }
+        }
+        public void ChangeArenaImg(int indx)
+        {
+            Debug.Log("Changed arenaImg");
+            ArenaImg.texture = ArenaImgs[indx];
+        }
         public void GetName()
         {
             NetworkingManager.Singleton.UpdatePlayerName(IF_PlayerName.text);

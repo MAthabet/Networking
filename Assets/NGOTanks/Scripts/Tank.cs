@@ -12,11 +12,11 @@ namespace NGOTanks
         [SerializeField] Transform bulletHole;
         [SerializeField] TextMeshProUGUI text_PlayerName;
         [SerializeField] Transform PlayerHealth;
-        [SerializeField] Transform HUDRoot;
+        //[SerializeField] Transform HUDRoot;
         [SerializeField] Bullet bulletPrefab;
 
 
-        Transform cam;
+        //Transform cam;
         Rigidbody rb;
         TankStats stats;
         GameObject abilityPrefab;
@@ -33,7 +33,7 @@ namespace NGOTanks
         private void Awake()
         {
             inputActions = new IA_Tank();
-            cam = Camera.main.transform;
+            //cam = Camera.main.transform;
             stats = GetComponent<TankStatsData>().tankStats;
         }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -45,7 +45,7 @@ namespace NGOTanks
         // Update is called once per frame
         void Update()
         {
-            HUDRoot.LookAt(cam);
+            //HUDRoot.LookAt(cam);
 
             if (isDead)
             {

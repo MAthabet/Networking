@@ -5,15 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/StylizedAOEVFXwithIndicators/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 0
-    path: Assets/RPS/Scenes/MainMenu.unity
-    guid: 2da4b3ff3ee7dfe4ba40126356f590fd
-  - enabled: 0
-    path: Assets/RPS/Scenes/Game.unity
-    guid: 6b743b7b179b065499d438212820c3a8
   - enabled: 1
     path: Assets/NGOTanks/Scene/MainMenu.unity
     guid: fdaf71ed156b7aa4ab30b38d1a420fc0
@@ -21,11 +12,11 @@ EditorBuildSettings:
     path: Assets/NGOTanks/Scene/Lobby.unity
     guid: 2afc4fcc161dd054aab5df6a6331b36d
   - enabled: 1
-    path: Assets/NGOTanks/Scene/Game_OpenArena.unity
+    path: Assets/NGOTanks/Scene/Game Open Arena.unity
     guid: a09adfa6bb74fc5419ed0ee454bc1d19
   - enabled: 1
-    path: Assets/Brawl Arena/Scenes/ShowDown_Night.unity
-    guid: 60c349678c8a44130a68c71ae07b5efa
+    path: Assets/NGOTanks/Scene/Game Night Arena.unity
+    guid: b06c640fbd51b5545bb17c8d7716e445
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

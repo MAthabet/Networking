@@ -207,9 +207,7 @@ MonoBehaviour:
   bulletHole: {fileID: 7212553548080344757}
   text_PlayerName: {fileID: 3708657355857110247}
   PlayerHealth: {fileID: 2112023760148428934}
-  HUDRoot: {fileID: 2615455381528092188}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
-  ownerID: 0
 --- !u!114 &2534041809062168002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -742,18 +740,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4877923603161933201}
-  m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0.5, y: 0.5, z: -0.5, w: 0.5}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: -3.3333323, y: 3.333333, z: 3.3333323}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5.23, y: 5.23, z: 5.23}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6793042081307382725}
   - {fileID: 8850973140402556172}
   m_Father: {fileID: 2039636984433479675}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 90, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 3.8066666}
+  m_AnchoredPosition: {x: -8.04, y: 6}
   m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &2327343644355187267

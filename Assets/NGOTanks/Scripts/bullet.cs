@@ -35,7 +35,7 @@ namespace NGOTanks
                         NetworkPlayer netPlayer = NetworkingManager.Singleton.GetPlayer(tank.GetOwnerID());
                         Debug.Log("tank name: " + tank.gameObject.name) ;
                         Debug.Log($"Bullet {ownerID} hit {tank.GetOwnerID()}");
-                        if (GameSettings.Singelton.IsFriendlyFireOn())
+                        if (GameSettings.Singleton.IsFriendlyFireOn())
                         {
                             netPlayer.TakeDamage(damage, ownerID);
                         }

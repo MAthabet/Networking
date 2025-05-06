@@ -37119,6 +37119,21 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1672666446545052606, guid: 51510de34f82041149d25090ec962e10, type: 3}
   m_PrefabInstance: {fileID: 201700261}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1849526792759279088
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2409483227478061194}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1891920176100378762 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1672666446545052606, guid: 51510de34f82041149d25090ec962e10, type: 3}
@@ -37179,6 +37194,35 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3176268455257988227, guid: 81044204068d943dd8e46160655d2108, type: 3}
   m_PrefabInstance: {fileID: 2095638824}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2249383809150935792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2409483227478061194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8c53d1a14e423e4e857713ae709b148, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnPoints:
+  - playerTeam: 1
+    playerClass: 2
+    spawnTransform: {fileID: 2132351435}
+    TankPrefab: {fileID: 5218160114514607975, guid: 801d8aa9043a90e4194b60c50a973aa8, type: 3}
+  - playerTeam: 1
+    playerClass: 1
+    spawnTransform: {fileID: 958053050}
+    TankPrefab: {fileID: 1658995557577282881, guid: e836a0006c803a64892f81baed118f48, type: 3}
+  - playerTeam: 2
+    playerClass: 1
+    spawnTransform: {fileID: 1671181172}
+    TankPrefab: {fileID: 5452492955926189614, guid: ce051b2d4621a8b4b9de543a3e3fe41b, type: 3}
+  - playerTeam: 2
+    playerClass: 2
+    spawnTransform: {fileID: 95495259}
+    TankPrefab: {fileID: 5706765684457943553, guid: 4c870b1adcb13bc4a964c25f086c7e64, type: 3}
 --- !u!4 &2269922683614342662 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7790047697380616352, guid: a08f59b910c8446a681d1932a4ffe269, type: 3}
@@ -37209,6 +37253,23 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1672666446545052606, guid: 51510de34f82041149d25090ec962e10, type: 3}
   m_PrefabInstance: {fileID: 2096711319}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2409483227478061194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1849526792759279088}
+  - component: {fileID: 2249383809150935792}
+  m_Layer: 0
+  m_Name: Level Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!4 &2453804539846263371 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 779091436301119123, guid: 166dc75935ef5473eb1dea7565c83806, type: 3}
@@ -38929,3 +38990,4 @@ SceneRoots:
   - {fileID: 958053050}
   - {fileID: 1671181172}
   - {fileID: 95495259}
+  - {fileID: 1849526792759279088}

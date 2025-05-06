@@ -3,6 +3,7 @@ using Unity.Netcode;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using System;
+using System.Globalization;
 
 namespace NGOTanks
 {
@@ -11,9 +12,14 @@ namespace NGOTanks
         static NetworkingManager singleton;
         public static new NetworkingManager Singleton => singleton;
 
-        public const string GameSceneName = "Gameplay";
+        //all game scenes must contain this word
+        public const string GameSceneIdentifer = "Game";
         public const string LobbySceneName = "Lobby";
         public const string MainMenuSceneName = "MainMenu";
+
+        //looks idiotic but im too lazy to make scriptable object 
+        //TODO: scriptable object for game scenes
+        public String[] GameScenesNames;
 
         private PlayerData localPlayerData;
         public PlayerData LocalPlayerData
@@ -51,18 +57,18 @@ namespace NGOTanks
 
         private void HandleServerStarted()
         {
-            Singleton.SceneManager.OnLoadComplete += OnLobbySceneLoaded;
+            SceneManager.OnLoadComplete += OnLobbySceneLoaded;
             SceneManager.LoadScene(LobbySceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);            
         }
 
         private void OnLobbySceneLoaded(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
         {
-            if (Singleton.IsServer && sceneName == LobbySceneName)
+            if (IsServer && sceneName == LobbySceneName)
             {
                 GameObject gameSettings = Instantiate(gameSettingsPrefab);
                 gameSettings.GetComponent<NetworkObject>().Spawn();
 
-                Singleton.SceneManager.OnLoadComplete -= OnLobbySceneLoaded;
+                SceneManager.OnLoadComplete -= OnLobbySceneLoaded;
             }
         }
 
@@ -145,6 +151,10 @@ namespace NGOTanks
                 }
             }
             return true;
+        }
+        public void LoadGameScene(int indx)
+        {
+            SceneManager.LoadScene(GameScenesNames[indx], LoadSceneMode.Single);
         }
     }
 }

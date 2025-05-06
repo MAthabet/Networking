@@ -5,58 +5,55 @@ using System.Collections.Generic;
 
 namespace NGOTanks
 {
-    [System.Serializable]
-    public class SpawnPoint
-    {
-        public Team playerTeam;
-        public Class playerClass;
-        public Transform spawnTransform;
-        public GameObject TankPrefab;
-    }
+    
     public class GamePlayManager : MonoBehaviour
     {
-        static NetworkingManager singleton;
-        public static NetworkingManager Singleton => singleton;
+        static GamePlayManager singleton;
+        public static GamePlayManager Singleton => singleton;
 
-
-        [SerializeField] List<SpawnPoint> spawnPoints;
-
+        private void Awake()
+        {
+            if (singleton == null)
+            {
+                singleton = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void Start()
         {
             NetworkingManager.Singleton.SceneManager.OnLoadComplete += OnSceneLoadComplete;
-
-            if(NetworkingManager.Singleton.IsHost)
-            {
-                spawnPlayer(NetworkingManager.Singleton.LocalClientId);                
-            }
         }
 
         private void OnSceneLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
         {
-            if (sceneName == NetworkingManager.GameSceneName)
+            if (sceneName.Contains(NetworkingManager.GameSceneIdentifer))
             {
-                spawnPlayer(clientId);
+                SpawnTank(clientId);
             }
         }
-        void spawnPlayer(ulong clientId)
+        void SpawnTank(ulong clientId)
         {
             if (NetworkingManager.Singleton.IsServer)
             {
                 NetworkPlayer player = NetworkingManager.Singleton.GetPlayer(clientId);
                 
                 Transform pos = getSpawnPointAndTankprefab(player.GetTeam(), player.GetClass(), out GameObject tankPrefab);
-
                 GameObject instance = Instantiate(tankPrefab, pos.position, Quaternion.identity);
                 NetworkObject obj = instance.GetComponent<NetworkObject>();
                 obj.SpawnAsPlayerObject(clientId);
                 player.ChangeTankID(obj.NetworkObjectId);
+
             }
 
         }
         Transform getSpawnPointAndTankprefab(Team pTeam, Class pClass, out GameObject prefab)
         {
-            foreach (SpawnPoint spawnPoint in spawnPoints)
+            foreach (SpawnPoint spawnPoint in LevelManager.Singleton.spawnPoints)
             {
                 if (spawnPoint.playerTeam == pTeam && spawnPoint.playerClass == pClass)
                 {

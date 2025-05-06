@@ -98,6 +98,7 @@ namespace NGOTanks
             pHealth.Value = _maxHP;
             maxHealth = _maxHP;
         }
+        
         //TODO: player request spawn to server so late join to be an option
         #endregion
 
@@ -131,7 +132,7 @@ namespace NGOTanks
 
             UIManager.Singleton.SendMsg($"Team {winnerTeam} Won");
         }
-
+        
         #endregion
         void UpdateOtherPlayersNameUI()
         {
@@ -228,9 +229,9 @@ namespace NGOTanks
         public override void OnNetworkDespawn()
         {
             base.OnNetworkDespawn();
+            Destroy(tank.gameObject);
             pData.OnValueChanged -= OnPlayerDataChanged;
             pHealth.OnValueChanged -= OnPlayerHealthChanged;
-            Destroy(tank.gameObject);
             NetworkingManager.Singleton.RemovePlayer(OwnerClientId);
         }
     }

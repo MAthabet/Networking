@@ -9,14 +9,15 @@ namespace NGOTanks
 
     public class GameSettings : NetworkBehaviour
     {
-        public static GameSettings Singelton;
+        public static GameSettings Singleton;
 
         NetworkVariable<bool> IsFriendlyFire = new NetworkVariable<bool>(false);
+        NetworkVariable<int> ArenaIndex = new NetworkVariable<int>();
         public override void OnNetworkSpawn()
         {
-            if(Singelton == null)
+            if (Singleton == null)
             {
-                Singelton = this;
+                Singleton = this;
                 DontDestroyOnLoad(gameObject);
             }
             else
@@ -25,13 +26,28 @@ namespace NGOTanks
             }
             base.OnNetworkSpawn();
             IsFriendlyFire.OnValueChanged += OnFriendlyFireChanged;
+            ArenaIndex.OnValueChanged += OnArenaIndexChanged;
+        }
+
+        private void OnArenaIndexChanged(int previousValue, int newValue)
+        {
+            if (!NetworkingManager.Singleton.IsHost)
+            {
+                UIManager.Singleton.ChangeArenaImg(newValue);
+                Debug.Log("Arena index changed to: " + newValue);
+            }
+            else
+                Debug.Log("IsHOst");
         }
 
         private void OnFriendlyFireChanged(bool previousValue, bool newValue)
         {
             UIManager.Singleton.UpdatefriendlyFireClientIndecator(newValue);
         }
-
+        public void UpdateIndx(int newIndx)
+        {
+            ArenaIndex.Value = newIndx;
+        }
         [ServerRpc]
         public void SetFriendlyFireServerRpc(bool value)
         {

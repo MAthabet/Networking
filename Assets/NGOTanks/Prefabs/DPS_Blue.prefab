@@ -923,18 +923,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3953406901382736294}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: -0.5, y: 0.5, z: 0.5}
+  m_LocalRotation: {x: 0.8231214, y: -0, z: -0, w: 0.56786543}
+  m_LocalPosition: {x: 0, y: 0, z: -0.575}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7974089722119992562}
   - {fileID: 3915805545293530872}
   m_Father: {fileID: 4934064528031836347}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 110.797, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0.28}
+  m_AnchoredPosition: {x: 0, y: 1}
   m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1545891719663969413
@@ -1473,9 +1473,7 @@ MonoBehaviour:
   bulletHole: {fileID: 2035713584382181469}
   text_PlayerName: {fileID: 6820106770366854267}
   PlayerHealth: {fileID: 1858743117310962684}
-  HUDRoot: {fileID: 3336375498499430275}
   bulletPrefab: {fileID: 8595722645617528170, guid: b5e30d367f49ba44e8eb6d5097c0dda5, type: 3}
-  ownerID: 0
 --- !u!114 &1228129124890193063
 MonoBehaviour:
   m_ObjectHideFlags: 0
